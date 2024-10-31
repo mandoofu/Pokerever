@@ -1,3 +1,27 @@
 <resources>
     <string name="app_name">Pokerever</string>
+    <string name="title_activity_home_screen">HomeScreen</string>
+    <string name="title_activity_info_screen">InfoScreen</string>
+    <string name="title_activity_login_screen">LoginScreen</string>
+    <string name="welcome_message">로그인 or 회원 가입</string>
+    <string name="login">로그인</string>
+    <string name="no_account_yet">회원이 아니신가요?</string>
+    <string name="member_create">회원 가입</string>
+    <string name="duplicate_check">중복 확인</string>
+    <string name="identity_verification">본인 인증</string>
+    <string name="or">or</string>
+    <string name="return_login">Log in with</string>
+    <string name="nick_name">닉네임</string>
+    <string name="nick_name_input">닉네임을 입력하세요</string>
+    <string name="email">이메일</string>
+    <string name="id">아이디</string>
+    <string name="sample_email">example@example.com</string>
+    <string name="password">비밀번호</string>
+    <string name="password_check">비밀번호확인</string>
+    <string name="password_input">비밀번호 입력</string>
+    <string name="member_insert">회원가입</string>
+    <string name="auto_login">자동 로그인</string>
+    <string name="name">이름</string>
+    <string name="registration">주민등록번호</string>
+    
 </resources>
