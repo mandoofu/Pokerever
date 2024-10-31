@@ -13,6 +13,21 @@
         android:theme="@style/Theme.Pokerever"
         tools:targetApi="31">
         <activity
+            android:name=".basic.ui.LoginScreen"
+            android:exported="false"
+            android:label="@string/title_activity_login_screen"
+            android:theme="@style/Theme.Pokerever" />
+        <activity
+            android:name=".basic.ui.InfoScreen"
+            android:exported="false"
+            android:label="@string/title_activity_info_screen"
+            android:theme="@style/Theme.Pokerever" />
+        <activity
+            android:name=".basic.ui.HomeScreen"
+            android:exported="false"
+            android:label="@string/title_activity_home_screen"
+            android:theme="@style/Theme.Pokerever" />
+        <activity
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
