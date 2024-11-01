@@ -40,7 +40,7 @@ fun RegisterScreen() {
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Black)
-            .padding(16.dp),
+            .padding(40.dp),
         verticalArrangement = Arrangement.SpaceEvenly,
         horizontalAlignment = Alignment.Start)
     {
@@ -55,81 +55,111 @@ fun RegisterScreen() {
         var name by remember { mutableStateOf("") }
         TextField(
             value = name,
-            onValueChange = { newText ->
-                name = newText
-            },
-            label = {
-                Text(text = stringResource(R.string.name))
-            },
+            onValueChange = { newText -> name = newText },
+            label = { Text(text = stringResource(R.string.name)) },
             colors = TextFieldDefaults.colors(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-            singleLine = true
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
         )
 
         var registration by remember { mutableStateOf("") }
-        TextField(
-            value = registration,
-            onValueChange = { newText ->
-                registration = newText
-            },
-            label = {
-                Text(text = stringResource(R.string.registration))
-            },
-            colors = TextFieldDefaults.colors(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            singleLine = true
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            TextField(
+                value = registration,
+                onValueChange = { newText -> registration = newText },
+                label = { Text(text = stringResource(R.string.registration)) },
+                colors = TextFieldDefaults.colors(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                singleLine = true,
+                modifier = Modifier.weight(1f)
+            )
+            Button(
+                onClick = { /* 중복 확인 로직 추가 */ },
+                modifier = Modifier
+                    .padding(start = 8.dp)
+                    .height(40.dp), // TextField 높이와 동일하게 설정
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.White,
+                        contentColor = Color.Black)
+            ) {
+                Text(text = stringResource(R.string.identity_verification), fontWeight = FontWeight.Bold)
+            }
+        }
         var nickname by remember { mutableStateOf("") }
-        TextField(
-            value = nickname,
-            onValueChange = { newText ->
-                nickname = newText
-            },
-            label = {
-                Text(text = stringResource(R.string.nick_name))
-            },
-            colors = TextFieldDefaults.colors(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-            singleLine = true
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            TextField(
+                value = nickname,
+                onValueChange = { newText -> nickname = newText },
+                label = { Text(text = stringResource(R.string.nick_name)) },
+                colors = TextFieldDefaults.colors(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                singleLine = true,
+                modifier = Modifier.weight(1f)
+            )
+            Button(
+                onClick = { /* 중복 확인 로직 추가 */ },
+                modifier = Modifier
+                    .padding(start = 8.dp)
+                    .height(40.dp), // TextField 높이와 동일하게 설정
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.White,
+                    contentColor = Color.Black)
+            ) {
+                Text(text = stringResource(R.string.duplicate_check), fontWeight = FontWeight.Bold)
+            }
+        }
         var email by remember { mutableStateOf("") }
-        TextField(
-            value = email,
-            onValueChange = { newText ->
-                email = newText
-            },
-            label = {
-                Text(text = stringResource(R.string.email))
-            },
-            colors = TextFieldDefaults.colors(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-            singleLine = true
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            TextField(
+                value = email,
+                onValueChange = { newText -> email = newText },
+                label = { Text(text = stringResource(R.string.email)) },
+                colors = TextFieldDefaults.colors(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                singleLine = true,
+                modifier = Modifier.weight(1f)
+            )
+            Button(
+                onClick = { /* 중복 확인 로직 추가 */ },
+                modifier = Modifier
+                    .padding(start = 8.dp)
+                    .height(40.dp), // TextField 높이와 동일하게 설정
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.White,
+                    contentColor = Color.Black)
+            ) {
+                Text(text = stringResource(R.string.duplicate_check), fontWeight = FontWeight.Bold)
+            }
+        }
         var password by remember { mutableStateOf("") }
         TextField(
             value = password,
-            onValueChange = { newText ->
-                password = newText
-            },
-            label = {
-                Text(text = stringResource(R.string.password))
-            },
+            onValueChange = { newText -> password = newText },
+            label = { Text(text = stringResource(R.string.password)) },
             colors = TextFieldDefaults.colors(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            singleLine = true
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
         )
         var passwordcheck by remember { mutableStateOf("") }
         TextField(
             value = passwordcheck,
-            onValueChange = { newText ->
-                passwordcheck = newText
-            },
-            label = {
-                Text(text = stringResource(R.string.password_check))
-            },
+            onValueChange = { newText -> passwordcheck = newText },
+            label = { Text(text = stringResource(R.string.password_check)) },
             colors = TextFieldDefaults.colors(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            singleLine = true
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
         )
 
         Row(
