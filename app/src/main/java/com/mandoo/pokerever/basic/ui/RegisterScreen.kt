@@ -40,7 +40,7 @@ fun RegisterScreen() {
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Black)
-            .padding(16.dp),
+            .padding(40.dp),
         verticalArrangement = Arrangement.SpaceEvenly,
         horizontalAlignment = Alignment.Start)
     {
@@ -55,81 +55,63 @@ fun RegisterScreen() {
         var name by remember { mutableStateOf("") }
         TextField(
             value = name,
-            onValueChange = { newText ->
-                name = newText
-            },
-            label = {
-                Text(text = stringResource(R.string.name))
-            },
+            onValueChange = { newText -> name = newText },
+            label = { Text(text = stringResource(R.string.name)) },
             colors = TextFieldDefaults.colors(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-            singleLine = true
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
         )
-
         var registration by remember { mutableStateOf("") }
         TextField(
             value = registration,
-            onValueChange = { newText ->
-                registration = newText
-            },
-            label = {
-                Text(text = stringResource(R.string.registration))
-            },
+            onValueChange = { newText -> registration = newText},
+            label = { Text(text = stringResource(R.string.registration)) },
             colors = TextFieldDefaults.colors(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            singleLine = true
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
         )
+
         var nickname by remember { mutableStateOf("") }
         TextField(
             value = nickname,
-            onValueChange = { newText ->
-                nickname = newText
-            },
-            label = {
-                Text(text = stringResource(R.string.nick_name))
-            },
+            onValueChange = { newText -> nickname = newText},
+            label = { Text(text = stringResource(R.string.nick_name))},
             colors = TextFieldDefaults.colors(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-            singleLine = true
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
         )
         var email by remember { mutableStateOf("") }
         TextField(
             value = email,
-            onValueChange = { newText ->
-                email = newText
-            },
-            label = {
-                Text(text = stringResource(R.string.email))
-            },
+            onValueChange = { newText -> email = newText },
+            label = { Text(text = stringResource(R.string.email)) },
             colors = TextFieldDefaults.colors(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-            singleLine = true
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
         )
         var password by remember { mutableStateOf("") }
         TextField(
             value = password,
-            onValueChange = { newText ->
-                password = newText
-            },
-            label = {
-                Text(text = stringResource(R.string.password))
-            },
+            onValueChange = { newText -> password = newText },
+            label = { Text(text = stringResource(R.string.password)) },
             colors = TextFieldDefaults.colors(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            singleLine = true
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
         )
         var passwordcheck by remember { mutableStateOf("") }
         TextField(
             value = passwordcheck,
-            onValueChange = { newText ->
-                passwordcheck = newText
-            },
-            label = {
-                Text(text = stringResource(R.string.password_check))
-            },
+            onValueChange = { newText -> passwordcheck = newText },
+            label = { Text(text = stringResource(R.string.password_check)) },
             colors = TextFieldDefaults.colors(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            singleLine = true
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
         )
 
         Row(
@@ -142,7 +124,7 @@ fun RegisterScreen() {
                 onClick = { },
                 Modifier
                     .width(108.dp)
-                    .height(40.dp) ,
+                    .height(40.dp),
                     colors = ButtonDefaults.buttonColors(
                     containerColor = Color.White,
                     contentColor = Color.Black

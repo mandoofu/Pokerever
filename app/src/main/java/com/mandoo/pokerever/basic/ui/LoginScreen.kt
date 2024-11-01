@@ -58,7 +58,7 @@ fun LoginScreen(){
         horizontalAlignment = Alignment.Start
     ) {
         Image(
-            painter = painterResource(id = R.drawable.pokereverlogo),
+            painter = painterResource(id = R.drawable.mainlogo),
             contentDescription = "Logo",
             modifier = Modifier.size(300.dp).padding(bottom = 12.dp)
         )
