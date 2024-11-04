@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -13,6 +14,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -53,11 +56,10 @@ fun RegisterScreen() {
         )
 
         var name by remember { mutableStateOf("") }
-        TextField(
+        OutlinedTextField(
             value = name,
             onValueChange = { newText -> name = newText },
             label = { Text(text = stringResource(R.string.name)) },
-            colors = TextFieldDefaults.colors(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
@@ -68,25 +70,21 @@ fun RegisterScreen() {
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            TextField(
+            OutlinedTextField(
                 value = registration,
                 onValueChange = { newText -> registration = newText },
                 label = { Text(text = stringResource(R.string.registration)) },
-                colors = TextFieldDefaults.colors(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 singleLine = true,
                 modifier = Modifier.weight(1f)
             )
-            Button(
+            OutlinedButton(
                 onClick = { /* 중복 확인 로직 추가 */ },
                 modifier = Modifier
-                    .padding(start = 8.dp)
+                    .padding(start = 8.dp, top = 8.dp)
                     .height(40.dp), // TextField 높이와 동일하게 설정
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.White,
-                        contentColor = Color.Black)
             ) {
-                Text(text = stringResource(R.string.identity_verification), fontWeight = FontWeight.Bold)
+                Text(text = stringResource(R.string.identity_verification), fontWeight = FontWeight.Bold, color = Color.White)
             }
         }
         var nickname by remember { mutableStateOf("") }
@@ -94,25 +92,21 @@ fun RegisterScreen() {
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            TextField(
+            OutlinedTextField(
                 value = nickname,
                 onValueChange = { newText -> nickname = newText },
                 label = { Text(text = stringResource(R.string.nick_name)) },
-                colors = TextFieldDefaults.colors(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                 singleLine = true,
                 modifier = Modifier.weight(1f)
             )
-            Button(
+            OutlinedButton(
                 onClick = { /* 중복 확인 로직 추가 */ },
                 modifier = Modifier
-                    .padding(start = 8.dp)
+                    .padding(start = 8.dp, top = 8.dp)
                     .height(40.dp), // TextField 높이와 동일하게 설정
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.White,
-                    contentColor = Color.Black)
             ) {
-                Text(text = stringResource(R.string.duplicate_check), fontWeight = FontWeight.Bold)
+                Text(text = stringResource(R.string.duplicate_check), fontWeight = FontWeight.Bold, color = Color.White)
             }
         }
         var email by remember { mutableStateOf("") }
@@ -120,43 +114,37 @@ fun RegisterScreen() {
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            TextField(
+            OutlinedTextField(
                 value = email,
                 onValueChange = { newText -> email = newText },
                 label = { Text(text = stringResource(R.string.email)) },
-                colors = TextFieldDefaults.colors(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 singleLine = true,
                 modifier = Modifier.weight(1f)
             )
-            Button(
+            OutlinedButton(
                 onClick = { /* 중복 확인 로직 추가 */ },
                 modifier = Modifier
-                    .padding(start = 8.dp)
+                    .padding(start = 8.dp, top = 8.dp)
                     .height(40.dp), // TextField 높이와 동일하게 설정
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.White,
-                    contentColor = Color.Black)
             ) {
-                Text(text = stringResource(R.string.duplicate_check), fontWeight = FontWeight.Bold)
+                Text(text = stringResource(R.string.duplicate_check), fontWeight = FontWeight.Bold, color = Color.White)
             }
         }
         var password by remember { mutableStateOf("") }
-        TextField(
+        OutlinedTextField(
             value = password,
             onValueChange = { newText -> password = newText },
             label = { Text(text = stringResource(R.string.password)) },
-            colors = TextFieldDefaults.colors(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
         var passwordcheck by remember { mutableStateOf("") }
-        TextField(
+        OutlinedTextField(
             value = passwordcheck,
             onValueChange = { newText -> passwordcheck = newText },
             label = { Text(text = stringResource(R.string.password_check)) },
-            colors = TextFieldDefaults.colors(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
