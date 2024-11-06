@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -41,13 +40,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.mandoo.pokerever.R
 
-@Preview(showSystemUi = true)
+
 @Composable
-fun LoginScreen(){
+fun LoginScreen(navController: NavController) {
 
     Column(
         modifier = Modifier
@@ -60,7 +59,9 @@ fun LoginScreen(){
         Image(
             painter = painterResource(id = R.drawable.mainlogo),
             contentDescription = "Logo",
-            modifier = Modifier.size(300.dp).padding(bottom = 12.dp)
+            modifier = Modifier
+                .size(300.dp)
+                .padding(bottom = 12.dp)
         )
         var email by remember { mutableStateOf("") }
         TextField(
@@ -135,8 +136,8 @@ fun LoginScreen(){
                 } else {
                     null
                 }, colors = SwitchDefaults.colors(
-                    checkedIconColor = Color.White,
-                    checkedTrackColor = Color.White
+                    checkedIconColor = Color.Red,
+                    checkedTrackColor = Color.Gray
                 ))
         }
         Row(
@@ -145,10 +146,11 @@ fun LoginScreen(){
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(text = stringResource(R.string.no_account_yet),
-                color = Color.Gray, modifier = Modifier.clickable { })
+                color = Color.Gray,
+                modifier = Modifier.clickable { navController.navigate("register") })
         }
         Button(
-            onClick = { },
+            onClick = { navController.navigate("bottom_tab") },
             Modifier
                 .width(108.dp)
                 .height(40.dp)

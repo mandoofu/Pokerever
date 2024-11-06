@@ -6,38 +6,29 @@
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/mainlogo"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Pokerever"
         tools:targetApi="31">
+
+        <!-- SplashScreenActivity를 앱 시작 지점으로 설정 -->
         <activity
-            android:name=".basic.ui.LoginScreen"
-            android:exported="false"
-            android:label="@string/title_activity_login_screen"
-            android:theme="@style/Theme.Pokerever" />
-        <activity
-            android:name=".basic.ui.InfoScreen"
-            android:exported="false"
-            android:label="@string/title_activity_info_screen"
-            android:theme="@style/Theme.Pokerever" />
-        <activity
-            android:name=".basic.ui.HomeScreen"
-            android:exported="false"
-            android:label="@string/title_activity_home_screen"
-            android:theme="@style/Theme.Pokerever" />
+            android:name=".basic.ui.SplashScreenActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- MainActivity는 LAUNCHER 인텐트 필터 없이 설정 -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Pokerever">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:theme="@style/Theme.Pokerever" />
     </application>
 
 </manifest>
