@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.mandoo.pokerever.R
+import com.mandoo.pokerever.widget.LazyCreateStoreList
 
 @Composable
 fun HomeScreen(navController: NavController) {
@@ -64,5 +65,6 @@ fun HomeScreen(navController: NavController) {
                 fontWeight = FontWeight.Medium,
                 fontSize = 16.sp,)
         }
+        LazyCreateStoreList(navController)
     }
 }

@@ -24,9 +24,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.mandoo.pokerever.R
+import com.mandoo.pokerever.common.CreateStoreInfo
 
 @Composable
-fun StoreDetailScreen(navController: NavController) {
+fun StoreDetailScreen(navController: NavController, sroreInfo: CreateStoreInfo) {
     Column(
         modifier = Modifier
             .fillMaxSize()

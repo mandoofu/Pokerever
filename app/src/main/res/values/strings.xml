@@ -36,6 +36,9 @@
     <string name="logout">로그아웃</string>
     <string name="user_delete">회원탈퇴</string>
     <string name="data_road">저장하기</string>
+    <string name="store_name">매장명 : </string>
+    <string name="store_address">주소 :  : </string>
+    <string name="store_distance">포인트 : </string>
 
 
 </resources>
