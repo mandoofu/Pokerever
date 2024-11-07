@@ -28,6 +28,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.mandoo.pokerever.R
+import com.mandoo.pokerever.widget.LazyStoreList
 
 @Composable
 fun StoreScreen(navController: NavController) {
@@ -67,6 +68,7 @@ fun StoreScreen(navController: NavController) {
                 .fillMaxWidth()
                 .padding(vertical = 8.dp)
         )
+        LazyStoreList()
     }
 }
 
