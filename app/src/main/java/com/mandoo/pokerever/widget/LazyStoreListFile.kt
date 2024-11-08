@@ -1,6 +1,5 @@
 package com.mandoo.pokerever.widget
 
-import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -33,7 +32,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -42,18 +40,19 @@ import androidx.compose.ui.window.Dialog
 import com.mandoo.pokerever.R
 import com.mandoo.pokerever.common.StoreInfo
 import com.mandoo.pokerever.common.StoreInit
+import okhttp3.internal.toImmutableList
 
 @Preview(showSystemUi = true)
 @Composable
 fun LazyStoreList() {
-    val composeCtx = LocalContext.current
-    val onGroupItemClick = { storeInfo: StoreInfo ->
-        Toast.makeText(
-            composeCtx,
-            "${storeInfo.address} 입니다!",
-            Toast.LENGTH_SHORT
-        ).show()
-    }
+    /*    val composeCtx = LocalContext.current
+        val onGroupItemClick = { storeInfo: StoreInfo ->
+            Toast.makeText(
+                composeCtx,
+                "${storeInfo.address} 입니다!",
+                Toast.LENGTH_SHORT
+            ).show()
+        }*/
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
@@ -62,8 +61,11 @@ fun LazyStoreList() {
         LazyColumn(
             userScrollEnabled = true //Default
         ) {
-            items(StoreInit.shuffleStoreInfoList()) { item ->
-                StoreListItemUI(storeInfo = item, onItemClick = onGroupItemClick)
+            items(
+                items = StoreInit.sortCreateStoreInfoList().toImmutableList(),
+//                key = { it.storeName }
+            ) { item ->
+                StoreListItemUI(storeInfo = item, onItemClick = {})
             }
         }
     }
@@ -169,7 +171,7 @@ fun StoreListItemUI(storeInfo: StoreInfo, onItemClick: (StoreInfo) -> Unit) {
                     )
                     Spacer(modifier = Modifier.width(1.dp)) // 텍스트 간의 간격
                     Text(
-                        text = storeInfo.distanceRes,
+                        text = "${storeInfo.distanceRes}M",
                         style = typography.bodySmall,
                         color = Color.White
                     )

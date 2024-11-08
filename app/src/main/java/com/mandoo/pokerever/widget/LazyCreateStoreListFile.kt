@@ -1,6 +1,5 @@
 package com.mandoo.pokerever.widget
 
-import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -37,24 +36,16 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.mandoo.pokerever.common.CreateStoreInfo
 import com.mandoo.pokerever.common.CreateStoreInit
+import okhttp3.internal.toImmutableList
 
 @Composable
 fun LazyCreateStoreList(navController: NavController) {
-    val composeCtx = LocalContext.current
-    val onGroupItemClick = { storeInfo: CreateStoreInfo ->
-        Toast.makeText(
-            composeCtx,
-            "${storeInfo.address} 입니다!",
-            Toast.LENGTH_SHORT
-        ).show()
-    }
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
@@ -63,17 +54,30 @@ fun LazyCreateStoreList(navController: NavController) {
         LazyColumn(
             userScrollEnabled = true //Default
         ) {
-            items(CreateStoreInit.shuffleCreateStoreInfoList()) { item ->
+            items(CreateStoreInit.sortCreateStoreInfoList().toImmutableList()) { item ->
                 CreateStoreListItemUI(
                     storeInfo = item,
-                    onStoreClick = { storeId -> navController.navigate("store_detail_screen/$storeId") })
+                    onStoreClick = { storeId -> navController.navigate("store_detail_screen/$storeId") },
+                    onLikeClick = { storeId, isLike ->
+                        CreateStoreInit.updateStoreLikeStatus(
+                            storeId,
+                            isLike
+                        )
+                    }
+
+                )
+
             }
         }
     }
 }
 
 @Composable
-fun CreateStoreListItemUI(storeInfo: CreateStoreInfo, onStoreClick: (storeId: String) -> Unit) {
+fun CreateStoreListItemUI(
+    storeInfo: CreateStoreInfo,
+    onStoreClick: (storeId: String) -> Unit,
+    onLikeClick: (storeId: String, isLike: Boolean) -> Unit
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -171,6 +175,7 @@ fun CreateStoreListItemUI(storeInfo: CreateStoreInfo, onStoreClick: (storeId: St
                     checked = isMemberLike,
                     onCheckedChange = {
                         isMemberLike = !isMemberLike
+                        onLikeClick(storeInfo.id, isMemberLike)
                     }
                 ) {
                     Icon(
