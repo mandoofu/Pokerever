@@ -7,6 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.mandoo.pokerever.basic.ui.LoginScreen
+import com.mandoo.pokerever.basic.ui.RegisterScreen
 import com.mandoo.pokerever.tab.BottomNavigationBarScaffold
 import com.mandoo.pokerever.ui.theme.PokereverTheme
 
@@ -24,7 +25,10 @@ class MainActivity : ComponentActivity() {
                     startDestination = "login" // 첫 화면을 login으로 설정
                 ) {
                     composable("login") {
-                        LoginScreen(navController) // LoginScreen을 호출하고 NavController를 전달
+                        LoginScreen(navController)
+                    }
+                    composable("register") {
+                        RegisterScreen(navController)
                     }
                     composable("bottom_tab") {
                         BottomNavigationBarScaffold() // HomeScreen은 후에 추가

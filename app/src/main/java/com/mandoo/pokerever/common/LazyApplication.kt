@@ -17,10 +17,6 @@ class LazyApplication : Application(), ImageLoaderFactory {
         fun getLazyApplication() = lazyApplication
     }
 
-    /**
-     * Tutor Pyo
-     * Coil Image Cache Memory Custom
-     */
     override fun newImageLoader(): ImageLoader {
         return ImageLoader.Builder(this)
             .memoryCache {

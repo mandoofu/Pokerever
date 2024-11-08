@@ -6,6 +6,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
+import com.mandoo.pokerever.basic.ui.HomeScreen
 import com.mandoo.pokerever.basic.ui.InfoScreen
 import com.mandoo.pokerever.basic.ui.StoreDetailScreen
 import com.mandoo.pokerever.basic.ui.StoreScreen
@@ -25,6 +26,9 @@ fun NavGraphBuilder.sliceNavGraph(navController: NavController) {
         }
         composable(ScreenRouteDef.StoreTab.routeName) {
             StoreScreen(navController)
+        }
+        composable(ScreenRouteDef.HomeTab.routeName) {
+            HomeScreen(navController)
         }
         // StoreDetailScreen 추가
         composable("store_detail_screen/{storeId}") { backStackEntry ->
