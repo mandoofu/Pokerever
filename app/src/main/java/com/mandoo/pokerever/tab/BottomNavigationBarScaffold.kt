@@ -1,5 +1,6 @@
 package com.mandoo.pokerever.tab
 
+import android.util.Log
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -28,66 +29,61 @@ import com.mandoo.pokerever.common.sliceNavGraph
 fun BottomNavigationBarScaffold() {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentDestination = navBackStackEntry?.destination
+    val currentRoute = navBackStackEntry?.destination?.route
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
-            /**
-             * Bottom Bar 구성 하기
-             */
-            NavigationBar(
-                modifier = Modifier
-                    .height(56.dp),
-                containerColor = Color.Gray
-            ) {
-                BottomNavigationItem().renderBottomNavigationItems()
-                    .forEachIndexed { _, navigationItem ->
-                        NavigationBarItem(
-                            selected = navigationItem.route == currentDestination?.route,
-                            label = {
-                                Text(
-                                    text = navigationItem.tabName,
-                                    color = Color.White
-                                )
-                            },
-                            icon = {
-                                navigationItem.icon?.let {
-                                    Icon(
-                                        painter = it, // painter 설정된 icon 사용
-                                        contentDescription = navigationItem.tabName,
-                                        modifier = Modifier.size(28.dp),
-                                        tint = Color.White
+            // store_detail_screen이 아닐 때만 BottomNavigationBar 표시
+            if (currentRoute != "store_detail_screen/{storeId}") {
+                Log.d("bottomtab", currentRoute.toString())
+                NavigationBar(
+                    modifier = Modifier.height(56.dp),
+                    containerColor = Color.Gray
+                ) {
+                    BottomNavigationItem().renderBottomNavigationItems()
+                        .forEachIndexed { _, navigationItem ->
+                            NavigationBarItem(
+                                selected = navigationItem.route == currentRoute,
+                                label = {
+                                    Text(
+                                        text = navigationItem.tabName,
+                                        color = Color.White
                                     )
-                                }
-                            },
-                            onClick = {
-                                navController.navigate(navigationItem.route) {
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        saveState = true
+                                },
+                                icon = {
+                                    navigationItem.icon?.let {
+                                        Icon(
+                                            painter = it,
+                                            contentDescription = navigationItem.tabName,
+                                            modifier = Modifier.size(28.dp),
+                                            tint = Color.White
+                                        )
                                     }
-                                    launchSingleTop = true
-                                    restoreState = true
+                                },
+                                onClick = {
+                                    navController.navigate(navigationItem.route) {
+                                        popUpTo(navController.graph.findStartDestination().id) {
+                                            saveState = true
+                                        }
+                                        launchSingleTop = true
+                                        restoreState = true
+                                    }
                                 }
-                            }
-                        )
-
-                    }
+                            )
+                        }
+                }
             }
         }
-    ) { paddingValues -> //Scaffold Content 의 Padding 컴포즈
+    ) { paddingValues ->
         NavHost(
             navController = navController,
-            startDestination = ScreenRouteDef.HomeTab.routeName, //홈을 시작 탭으로 설정
+            startDestination = ScreenRouteDef.HomeTab.routeName,
             modifier = Modifier.padding(paddingValues = paddingValues)
         ) {
             composable(ScreenRouteDef.HomeTab.routeName) {
-                HomeScreen(
-                    navController
-                )
+                HomeScreen(navController)
             }
-            /**
-             * Navigation Graph 를 분할
-             */
             sliceNavGraph(navController)
         }
     }

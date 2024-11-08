@@ -64,20 +64,22 @@ fun LazyCreateStoreList(navController: NavController) {
             userScrollEnabled = true //Default
         ) {
             items(CreateStoreInit.shuffleCreateStoreInfoList()) { item ->
-                CreateStoreListItemUI(storeInfo = item, navController = navController)
+                CreateStoreListItemUI(
+                    storeInfo = item,
+                    onStoreClick = { storeId -> navController.navigate("store_detail_screen/$storeId") })
             }
         }
     }
 }
 
 @Composable
-fun CreateStoreListItemUI(storeInfo: CreateStoreInfo, navController: NavController) {
+fun CreateStoreListItemUI(storeInfo: CreateStoreInfo, onStoreClick: (storeId: String) -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
             .clickable {
-                navController.navigate("store_detail_screen/${(storeInfo.id)}")
+                onStoreClick(storeInfo.id)
             },
         shape = RoundedCornerShape(8.dp),
         border = BorderStroke(1.dp, Color.LightGray),
