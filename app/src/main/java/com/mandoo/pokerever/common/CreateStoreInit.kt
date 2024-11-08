@@ -1,9 +1,10 @@
 package com.mandoo.pokerever.common
 
 import androidx.annotation.DrawableRes
+import androidx.compose.runtime.Stable
 import com.mandoo.pokerever.R
-import kotlin.random.Random
 
+@Stable
 data class CreateStoreInfo(
     val id: String,
     val storeName: String = "",
@@ -14,7 +15,7 @@ data class CreateStoreInfo(
     val addressRes: String = "",
     val point: String = "",
     val pointRes: String = "",
-    var isLike: Boolean = Random.nextBoolean()
+    var isLike: Boolean = false
 )
 
 object CreateStoreInit {
@@ -87,13 +88,18 @@ object CreateStoreInit {
         }
     }
 
-    fun shuffleCreateStoreInfoList(): MutableList<CreateStoreInfo> {
-        createStoreList.shuffle()
-        return createStoreList
+    // 좋아요 상태 업데이트 함수
+    fun updateStoreLikeStatus(storeId: String, isLike: Boolean) {
+        createStoreList.find { it.id == storeId }?.isLike = isLike
     }
 
+
+    fun sortCreateStoreInfoList(): List<CreateStoreInfo> {
+        // storeId 값 기준으로 오름차순 정렬
+        return createStoreList.sortedBy { it.id }
+    }
     fun getStoreInfoById(storeId: String): CreateStoreInfo? {
         // CreateStoreList에서 id가 storeId인 항목을 찾아 반환
-        return CreateStoreInit.shuffleCreateStoreInfoList().find { it.id == storeId }
+        return CreateStoreInit.sortCreateStoreInfoList().find { it.id == storeId }
     }
 }

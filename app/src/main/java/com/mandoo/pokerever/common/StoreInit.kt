@@ -1,9 +1,10 @@
 package com.mandoo.pokerever.common
 
 import androidx.annotation.DrawableRes
+import androidx.compose.runtime.Stable
 import com.mandoo.pokerever.R
-import kotlin.random.Random
 
+@Stable
 data class StoreInfo(
     val storeName: String = "",
     val storeNameRes: String = "",
@@ -12,8 +13,7 @@ data class StoreInfo(
     val address: String = "",
     val addressRes: String = "",
     val distance: String = "",
-    val distanceRes: String = "",
-    var isLike: Boolean = Random.nextBoolean()
+    val distanceRes: Long
 )
 
 object StoreInit {
@@ -29,7 +29,7 @@ object StoreInit {
                     "주소 : ",
                     "서울시 관악구 695-23",
                     "거리 : ",
-                    "648m"
+                    64
                 )
             )
             add(
@@ -40,7 +40,7 @@ object StoreInit {
                     "주소 : ",
                     "서울시 관악구 695-23",
                     "거리 : ",
-                    "648m"
+                    648
                 )
             )
             add(
@@ -51,7 +51,7 @@ object StoreInit {
                     "주소 : ",
                     "서울시 관악구 695-23",
                     "거리 : ",
-                    "648m"
+                    608
                 )
             )
             add(
@@ -62,7 +62,7 @@ object StoreInit {
                     "주소 : ",
                     "서울시 관악구 695-23",
                     "거리 : ",
-                    "648m"
+                    248
                 )
             )
             add(
@@ -73,7 +73,7 @@ object StoreInit {
                     "주소 : ",
                     "서울시 관악구 695-23",
                     "거리 : ",
-                    "648m"
+                    48
                 )
             )
             add(
@@ -84,7 +84,7 @@ object StoreInit {
                     "주소 : ",
                     "서울시 관악구 695-23",
                     "거리 : ",
-                    "648m"
+                    248
                 )
             )
             add(
@@ -95,7 +95,7 @@ object StoreInit {
                     "주소 : ",
                     "서울시 관악구 695-23",
                     "거리 : ",
-                    "648m"
+                    618
                 )
             )
             add(
@@ -106,7 +106,7 @@ object StoreInit {
                     "주소 : ",
                     "서울시 관악구 695-23",
                     "거리 : ",
-                    "648m"
+                    128
                 )
             )
             add(
@@ -117,7 +117,7 @@ object StoreInit {
                     "주소 : ",
                     "서울시 관악구 695-23",
                     "거리 : ",
-                    "648m"
+                    6048
                 )
             )
 
@@ -129,7 +129,7 @@ object StoreInit {
                     "주소 : ",
                     "서울시 관악구 695-23",
                     "거리 : ",
-                    "648m"
+                    248
                 )
             )
             add(
@@ -140,7 +140,7 @@ object StoreInit {
                     "주소 : ",
                     "서울시 관악구 695-23",
                     "거리 : ",
-                    "648m"
+                    148
                 )
             )
             add(
@@ -151,7 +151,7 @@ object StoreInit {
                     "주소 : ",
                     "서울시 관악구 695-23",
                     "거리 : ",
-                    "648m"
+                    448
                 )
             )
             add(
@@ -162,7 +162,7 @@ object StoreInit {
                     "주소 : ",
                     "서울시 관악구 695-23",
                     "거리 : ",
-                    "648m"
+                    6248
                 )
             )
             add(
@@ -173,7 +173,7 @@ object StoreInit {
                     "주소 : ",
                     "서울시 관악구 695-23",
                     "거리 : ",
-                    "648m"
+                    6418
                 )
             )
             add(
@@ -184,7 +184,7 @@ object StoreInit {
                     "주소 : ",
                     "서울시 관악구 695-23",
                     "거리 : ",
-                    "648m"
+                    6438
                 )
             )
             add(
@@ -195,7 +195,7 @@ object StoreInit {
                     "주소 : ",
                     "서울시 관악구 695-23",
                     "거리 : ",
-                    "648m"
+                    1648
                 )
             )
             add(
@@ -206,15 +206,15 @@ object StoreInit {
                     "주소 : ",
                     "서울시 관악구 695-23",
                     "거리 : ",
-                    "648m"
+                    2648
                 )
             )
 
         }
     }
 
-    fun shuffleStoreInfoList(): MutableList<StoreInfo> {
-        storeList.shuffle()
-        return storeList
+    fun sortCreateStoreInfoList(): List<StoreInfo> {
+        // distanceRes 값 기준으로 오름차순 정렬
+        return storeList.sortedBy { it.distanceRes }
     }
 }

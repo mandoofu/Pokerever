@@ -17,6 +17,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -28,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -77,29 +79,38 @@ fun InfoScreen(navController: NavController) {
         var name by remember { mutableStateOf("") }
         OutlinedTextField(
             value = name,
-            onValueChange = { newText -> name = newText },
+            onValueChange = { },
             label = { Text(text = stringResource(R.string.name)) },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            enabled = false,
+            colors = OutlinedTextFieldDefaults.colors(
+                disabledBorderColor = Color.Gray,
+                disabledLabelColor = Color.Gray
+            )
         )
         var nickname by remember { mutableStateOf("") }
         OutlinedTextField(
             value = nickname,
-            onValueChange = { newText -> nickname = newText },
+            onValueChange = { },
             label = { Text(text = stringResource(R.string.nick_name)) },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            enabled = false,
+            colors = OutlinedTextFieldDefaults.colors(
+                disabledBorderColor = Color.Gray,
+                disabledLabelColor = Color.Gray
+            )
         )
         var datebirth by remember { mutableStateOf("") }
         OutlinedTextField(
             value = datebirth,
-            onValueChange = { newText -> datebirth = newText },
+            onValueChange = { },
             label = { Text(text = stringResource(R.string.date_of_birth)) },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            enabled = false,
+            colors = OutlinedTextFieldDefaults.colors(
+                disabledBorderColor = Color.Gray,
+                disabledLabelColor = Color.Gray
+            )
         )
         var password by remember { mutableStateOf("") }
         OutlinedTextField(
@@ -108,7 +119,12 @@ fun InfoScreen(navController: NavController) {
             label = { Text(text = stringResource(R.string.password)) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             singleLine = true,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            textStyle = TextStyle(color = Color.White),
+            colors = OutlinedTextFieldDefaults.colors(
+                unfocusedBorderColor = Color.LightGray,
+                unfocusedLabelColor = Color.LightGray
+            )
         )
         var passwordcheck by remember { mutableStateOf("") }
         OutlinedTextField(
@@ -117,7 +133,12 @@ fun InfoScreen(navController: NavController) {
             label = { Text(text = stringResource(R.string.password_check)) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
             singleLine = true,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            textStyle = TextStyle(color = Color.White),
+            colors = OutlinedTextFieldDefaults.colors(
+                unfocusedBorderColor = Color.LightGray,
+                unfocusedLabelColor = Color.LightGray
+            )
         )
         Spacer(modifier = Modifier.weight(1f)) // 남은 공간을 차지하게 하여 버튼을 아래로 밀어내기
 
