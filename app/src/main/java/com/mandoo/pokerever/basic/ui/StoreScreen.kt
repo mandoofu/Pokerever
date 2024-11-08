@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -40,7 +41,6 @@ fun StoreScreen(navController: NavController) {
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.Start
     ) {
-        // Row를 사용하지 않고 OutlinedTextField 내부에 아이콘을 추가
         var storename by remember { mutableStateOf("") }
         OutlinedTextField(
             value = storename,
@@ -58,7 +58,8 @@ fun StoreScreen(navController: NavController) {
                     contentDescription = null,
                     modifier = Modifier.padding(end = 8.dp) // 아이콘과 텍스트 간 간격 조정
                 )
-            }
+            },
+            textStyle = TextStyle(color = Color.White)
         )
 
         HorizontalDivider(
