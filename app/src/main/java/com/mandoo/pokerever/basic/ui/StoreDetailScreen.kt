@@ -174,7 +174,7 @@ fun StoreDetailScreen(navController: NavController, sroreInfo: CreateStoreInfo) 
                             Spacer(modifier = Modifier.width(8.dp))
 
                             // 포인트 입력 필드
-                            var pointInput by remember { mutableStateOf("0") } // 초기값 설정
+                            var pointInput by remember { mutableStateOf("") } // 초기값 설정
 
                             Box(
                                 modifier = Modifier

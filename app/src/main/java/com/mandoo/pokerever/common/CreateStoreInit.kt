@@ -95,8 +95,9 @@ object CreateStoreInit {
 
 
     fun sortCreateStoreInfoList(): List<CreateStoreInfo> {
-        // storeId 값 기준으로 오름차순 정렬
-        return createStoreList.sortedBy { it.id }
+        // isLike true 값 설정 우선 정렬 후 storeId 값 기준으로 오름차순 정렬
+        return createStoreList
+            .sortedWith(compareByDescending<CreateStoreInfo> { it.isLike }.thenBy { it.id })
     }
     fun getStoreInfoById(storeId: String): CreateStoreInfo? {
         // CreateStoreList에서 id가 storeId인 항목을 찾아 반환

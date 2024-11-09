@@ -69,7 +69,7 @@ fun StoreScreen(navController: NavController) {
                 .fillMaxWidth()
                 .padding(vertical = 8.dp)
         )
-        LazyStoreList()
+        LazyStoreList(storename)
     }
 }
 

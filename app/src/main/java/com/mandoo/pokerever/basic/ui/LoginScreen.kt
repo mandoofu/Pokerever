@@ -136,7 +136,7 @@ fun LoginScreen(navController: NavController) {
                 } else {
                     null
                 }, colors = SwitchDefaults.colors(
-                    checkedIconColor = Color.Red,
+                    checkedIconColor = Color.Green,
                     checkedTrackColor = Color.Gray
                 ))
         }
