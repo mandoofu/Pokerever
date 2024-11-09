@@ -1,5 +1,7 @@
 package com.mandoo.pokerever.widget
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -32,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -40,19 +43,19 @@ import androidx.compose.ui.window.Dialog
 import com.mandoo.pokerever.R
 import com.mandoo.pokerever.common.StoreInfo
 import com.mandoo.pokerever.common.StoreInit
+import com.mandoo.pokerever.map.openNaverMap
 import okhttp3.internal.toImmutableList
 
-@Preview(showSystemUi = true)
 @Composable
-fun LazyStoreList() {
-    /*    val composeCtx = LocalContext.current
-        val onGroupItemClick = { storeInfo: StoreInfo ->
-            Toast.makeText(
-                composeCtx,
-                "${storeInfo.address} 입니다!",
-                Toast.LENGTH_SHORT
-            ).show()
-        }*/
+fun LazyStoreList(searchQuery: String) {
+    val filteredStores = StoreInit.sortCreateStoreInfoList().filter {
+        it.storeNameRes.contains(searchQuery, ignoreCase = true)
+    }
+    LazyColumn {
+        items(items = filteredStores) { item ->
+            StoreListItemUI(storeInfo = item, onItemClick = {})
+        }
+    }
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
@@ -74,6 +77,7 @@ fun LazyStoreList() {
 @Composable
 fun StoreListItemUI(storeInfo: StoreInfo, onItemClick: (StoreInfo) -> Unit) {
     var isDialogVisible by remember { mutableStateOf(false) }
+    val context = LocalContext.current
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -155,7 +159,9 @@ fun StoreListItemUI(storeInfo: StoreInfo, onItemClick: (StoreInfo) -> Unit) {
                         contentDescription = null,
                         modifier = Modifier
                             .size(20.dp) // 아이콘 크기 설정
-                            .clickable { }
+                            .clickable {
+                                openNaverMap(context, storeInfo.addressRes)
+                            }
                     )
                 }
                 Spacer(modifier = Modifier.height(4.dp))
@@ -223,7 +229,7 @@ fun StoreListItemUI(storeInfo: StoreInfo, onItemClick: (StoreInfo) -> Unit) {
                                             .padding(vertical = 8.dp),
                                         contentAlignment = Alignment.Center
                                     ) {
-                                        Text(text = "취소")
+                                        Text(text = "취소", color = Color.Black)
                                     }
                                     Box(
                                         modifier = Modifier
@@ -241,7 +247,7 @@ fun StoreListItemUI(storeInfo: StoreInfo, onItemClick: (StoreInfo) -> Unit) {
                                             .padding(vertical = 8.dp),
                                         contentAlignment = Alignment.Center
                                     ) {
-                                        Text(text = "추가")
+                                        Text(text = "추가", color = Color.Black)
                                     }
                                 }
                             }
