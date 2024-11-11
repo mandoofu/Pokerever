@@ -97,7 +97,7 @@ fun StoreDetailScreen(navController: NavController, sroreInfo: CreateStoreInfo) 
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = stringResource(R.string.point), style = pointInfoTextStyle)
+                Text(text = stringResource(R.string.user_point), style = pointInfoTextStyle)
                 Spacer(modifier = Modifier.width(1.dp)) // 텍스트 간의 간격
                 Text(text = ("100"), style = pointInfoTextStyle) //매장 별 고객 포인트 정보 표출)
                 Text(text = ("p"), style = pointInfoTextStyle)

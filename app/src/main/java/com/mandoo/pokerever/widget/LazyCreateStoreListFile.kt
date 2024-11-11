@@ -37,9 +37,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.mandoo.pokerever.R
 import com.mandoo.pokerever.common.CreateStoreInfo
 import com.mandoo.pokerever.common.CreateStoreInit
 import okhttp3.internal.toImmutableList
@@ -108,7 +110,7 @@ fun CreateStoreListItemUI(
                     .clip(CircleShape),
                 contentScale = ContentScale.Crop,
                 painter = painterResource(id = storeInfo.imageRes),
-                contentDescription = storeInfo.address,
+                contentDescription = storeInfo.address
             )
             Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.align(Alignment.CenterVertically)) {
@@ -117,14 +119,14 @@ fun CreateStoreListItemUI(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = storeInfo.storeName,
+                        text = stringResource(id = R.string.store_name),
                         fontWeight = FontWeight.SemiBold,
                         style = typography.bodySmall,
                         color = Color.White
                     )
                     Spacer(modifier = Modifier.width(1.dp)) // 텍스트 간의 간격
                     Text(
-                        text = storeInfo.storeNameRes,
+                        text = storeInfo.storeName,
                         style = typography.bodySmall,
                         color = Color.White
                     )
@@ -134,15 +136,15 @@ fun CreateStoreListItemUI(
                     modifier = Modifier.padding(end = 16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+                    Text(
+                        text = stringResource(id = R.string.store_address),
+                        fontWeight = FontWeight.SemiBold,
+                        style = typography.bodySmall,
+                        color = Color.White
+                    )
+                    Spacer(modifier = Modifier.width(1.dp)) // 텍스트 간의 간격
                     Text(
                         text = storeInfo.address,
-                        fontWeight = FontWeight.SemiBold,
-                        style = typography.bodySmall,
-                        color = Color.White
-                    )
-                    Spacer(modifier = Modifier.width(1.dp)) // 텍스트 간의 간격
-                    Text(
-                        text = storeInfo.addressRes,
                         style = typography.bodySmall,
                         color = Color.White
                     )
@@ -153,14 +155,14 @@ fun CreateStoreListItemUI(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = storeInfo.point,
+                        text = stringResource(id = R.string.point),
                         fontWeight = FontWeight.SemiBold,
                         style = typography.bodySmall,
                         color = Color.White
                     )
                     Spacer(modifier = Modifier.width(1.dp)) // 텍스트 간의 간격
                     Text(
-                        text = storeInfo.pointRes,
+                        text = storeInfo.point,
                         style = typography.bodySmall,
                         color = Color.White
                     )

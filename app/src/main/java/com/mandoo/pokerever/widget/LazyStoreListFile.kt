@@ -1,7 +1,5 @@
 package com.mandoo.pokerever.widget
 
-import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -36,8 +34,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.mandoo.pokerever.R
@@ -49,7 +47,7 @@ import okhttp3.internal.toImmutableList
 @Composable
 fun LazyStoreList(searchQuery: String) {
     val filteredStores = StoreInit.sortCreateStoreInfoList().filter {
-        it.storeNameRes.contains(searchQuery, ignoreCase = true)
+        it.storeName.contains(searchQuery, ignoreCase = true)
     }
     LazyColumn {
         items(items = filteredStores) { item ->
@@ -117,14 +115,14 @@ fun StoreListItemUI(storeInfo: StoreInfo, onItemClick: (StoreInfo) -> Unit) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = storeInfo.storeName,
+                        text = stringResource(id = R.string.store_name),
                         fontWeight = FontWeight.SemiBold,
                         style = typography.bodySmall,
                         color = Color.White
                     )
                     Spacer(modifier = Modifier.width(1.dp)) // 텍스트 간의 간격
                     Text(
-                        text = storeInfo.storeNameRes,
+                        text = storeInfo.storeName,
                         style = typography.bodySmall,
                         color = Color.White
                     )
@@ -141,14 +139,14 @@ fun StoreListItemUI(storeInfo: StoreInfo, onItemClick: (StoreInfo) -> Unit) {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = storeInfo.address,
+                            text = stringResource(id = R.string.store_address),
                             fontWeight = FontWeight.SemiBold,
                             style = typography.bodySmall,
                             color = Color.White
                         )
                         Spacer(modifier = Modifier.width(1.dp)) // 텍스트 간의 간격
                         Text(
-                            text = storeInfo.addressRes,
+                            text = storeInfo.address,
                             style = typography.bodySmall,
                             color = Color.White
                         )
@@ -160,7 +158,7 @@ fun StoreListItemUI(storeInfo: StoreInfo, onItemClick: (StoreInfo) -> Unit) {
                         modifier = Modifier
                             .size(20.dp) // 아이콘 크기 설정
                             .clickable {
-                                openNaverMap(context, storeInfo.addressRes)
+                                openNaverMap(context, storeInfo.address)
                             }
                     )
                 }
@@ -170,14 +168,14 @@ fun StoreListItemUI(storeInfo: StoreInfo, onItemClick: (StoreInfo) -> Unit) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = storeInfo.distance,
+                        text = stringResource(id = R.string.store_distance),
                         fontWeight = FontWeight.SemiBold,
                         style = typography.bodySmall,
                         color = Color.White
                     )
                     Spacer(modifier = Modifier.width(1.dp)) // 텍스트 간의 간격
                     Text(
-                        text = "${storeInfo.distanceRes}M",
+                        text = "${storeInfo.distance}M",
                         style = typography.bodySmall,
                         color = Color.White
                     )
@@ -208,8 +206,9 @@ fun StoreListItemUI(storeInfo: StoreInfo, onItemClick: (StoreInfo) -> Unit) {
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Column {
                                         Text(
-                                            text = storeInfo.storeNameRes,
-                                            fontWeight = FontWeight.Bold
+                                            text = storeInfo.address,
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color.Black
                                         )
                                         Text(text = "추가 하시겠습니까?", color = Color.Black)
                                     }
