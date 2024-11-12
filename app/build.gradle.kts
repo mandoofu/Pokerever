@@ -2,7 +2,10 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     id("com.google.gms.google-services")
+    id("kotlin-kapt") // kapt 플러그인 추가
+    id("dagger.hilt.android.plugin") // Hilt 플러그인 추가
 }
+
 
 android {
     namespace = "com.mandoo.pokerever"
@@ -51,6 +54,7 @@ android {
 }
 
 dependencies {
+    // 기본 의존성
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -65,10 +69,25 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.coil.compose)
     implementation(libs.kotlinx.collections.immutable)
-    implementation (libs.firebase.firestore)
-    implementation (libs.firebase.messaging.ktx.v2331)
-    implementation (libs.firebase.database.ktx.v2030)
+
+    // Firebase 관련 의존성
+    implementation(libs.firebase.firestore)
+    implementation(libs.firebase.messaging.ktx.v2331)
+    implementation(libs.firebase.database.ktx.v2030)
     implementation(libs.firebase.bom)
+    implementation(libs.firebase.firestore.ktx)
+
+    // Hilt 관련 의존성
+    implementation(libs.hilt.android.v245)
+    implementation(libs.firebase.auth.ktx)  // 최신 버전
+    kapt(libs.hilt.android.compiler)
+
+    // ViewModel, Compose용 Hilt
+    implementation(libs.androidx.hilt.navigation.compose.v100) // 정확한 버전 확인
+    kapt(libs.androidx.hilt.compiler.v100)  // Hilt 컴파일러
+
+
+    // 테스트 의존성
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
