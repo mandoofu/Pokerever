@@ -10,7 +10,9 @@ import com.mandoo.pokerever.basic.ui.LoginScreen
 import com.mandoo.pokerever.basic.ui.RegisterScreen
 import com.mandoo.pokerever.tab.BottomNavigationBarScaffold
 import com.mandoo.pokerever.ui.theme.PokereverTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

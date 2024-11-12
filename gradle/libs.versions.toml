@@ -3,11 +3,19 @@ agp = "8.6.1"
 firebaseBom = "33.5.1"
 firebaseDatabaseKtxVersion = "20.3.0"
 firebaseMessagingKtxVersion = "23.3.1"
+googleHiltAndroid = "2.45"
+gradle = "7.4.2"
+hiltAndroid = "2.45"
+hiltAndroidGradlePlugin = "2.44"
+hiltCompiler = "1.0.0"
+hiltLifecycleViewmodel = "1.0.0-alpha03"
+hiltNavigationComposeVersion = "1.0.0"
 kotlin = "1.9.24"
 coreKtx = "1.13.1"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
+kotlinGradlePlugin = "1.8.0"
 kotlinxCollectionsImmutable = "0.3.8"
 lifecycleRuntimeKtx = "2.8.6"
 activityCompose = "1.9.3"
@@ -17,13 +25,21 @@ navigationRuntimeKtx = "2.8.3"
 navigationCompose = "2.8.3"
 coilCompose = "2.6.0"
 firebaseFirestore = "25.1.1"
+firebaseFirestoreKtx = "25.1.1"
+firebaseAuthKtx = "23.1.0"
 
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-hilt-compiler-v100 = { module = "androidx.hilt:hilt-compiler", version.ref = "hiltCompiler" }
+androidx-hilt-navigation-compose-v100 = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationComposeVersion" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 firebase-database-ktx-v2030 = { module = "com.google.firebase:firebase-database-ktx", version.ref = "firebaseDatabaseKtxVersion" }
 firebase-messaging-ktx-v2331 = { module = "com.google.firebase:firebase-messaging-ktx", version.ref = "firebaseMessagingKtxVersion" }
+gradle = { module = "com.android.tools.build:gradle", version.ref = "gradle" }
+hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroid" }
+hilt-android-gradle-plugin-v244 = { module = "com.google.dagger:hilt-android-gradle-plugin", version.ref = "hiltAndroidGradlePlugin" }
+hilt-android-v245 = { module = "com.google.dagger:hilt-android", version.ref = "googleHiltAndroid" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
@@ -41,8 +57,11 @@ androidx-material-icons-extended = { group = "androidx.compose.material", name =
 androidx-navigation-runtime-ktx = { group = "androidx.navigation", name = "navigation-runtime-ktx", version.ref = "navigationRuntimeKtx" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coilCompose" }
+kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlinGradlePlugin" }
 kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinxCollectionsImmutable" }
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore", version.ref = "firebaseFirestore" }
+firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-firestore-ktx", version.ref = "firebaseFirestoreKtx" }
+firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx", version.ref = "firebaseAuthKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
