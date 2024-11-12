@@ -1,5 +1,6 @@
 package com.mandoo.pokerever.basic.ui
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -147,7 +148,10 @@ fun LoginScreen(navController: NavController) {
         ) {
             Text(text = stringResource(R.string.no_account_yet),
                 color = Color.Gray,
-                modifier = Modifier.clickable { navController.navigate("register") })
+                modifier = Modifier.clickable {
+                    Log.d("LoginScreen", "회원이 아니신가요 클릭됨")
+                    navController.navigate("register")
+                })
         }
         Button(
             onClick = { navController.navigate("bottom_tab") },
