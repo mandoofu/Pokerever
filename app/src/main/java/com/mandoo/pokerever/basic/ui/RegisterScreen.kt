@@ -5,12 +5,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -276,7 +274,7 @@ fun RegisterScreen(navController: NavController) {
             onValueChange = { newText -> passwordcheck = newText },
             label = { Text(text = stringResource(R.string.password_check)) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            visualTransformation = PasswordVisualTransformation(), // 비밀번호 확인 입력 시 *로 보이도록 설정
+            visualTransformation = PasswordVisualTransformation(),
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
             textStyle = TextStyle(color = Color.White)
@@ -302,7 +300,7 @@ fun RegisterScreen(navController: NavController) {
                         password,
                         nickname
                     )
-                    navController.navigate("login_screen")
+                    navController.navigate("login")
                 }
             },
             modifier = Modifier
@@ -326,16 +324,10 @@ fun RegisterScreen(navController: NavController) {
             Text(
                 text = stringResource(R.string.return_login),
                 color = Color.White,
-                fontSize = 14.sp
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = stringResource(R.string.login),
-                color = Color(0xFF1D1D1D),
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.clickable {
-                    navController.navigate("login_screen")
+                    navController.navigate("login")
                 }
             )
         }

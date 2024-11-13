@@ -17,7 +17,7 @@ object ValidationUtil {
         return email.matches(Regex("^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}$"))
     }
 
-    // 비밀번호 유효성 검사 (예: 8자 이상, 숫자와 특수문자 포함)
+    // 비밀번호 유효성 검사 (예: 8자 이상, 영어,숫자,특수문자 포함)
     fun isValidPassword(password: String): Boolean {
         return password.length >= 8 &&
                 password.matches(Regex(".*[A-Za-z].*")) &&  // 영어 대소문자 포함
