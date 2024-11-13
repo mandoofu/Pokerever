@@ -15,6 +15,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,12 +28,21 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.mandoo.pokerever.R
+import com.mandoo.pokerever.viewmodel.StoreViewModel
 import com.mandoo.pokerever.widget.LazyStoreList
 
 @Composable
 fun StoreScreen(navController: NavController) {
+    val storeViewModel: StoreViewModel = viewModel()
+
+    // 화면이 시작될 때 Firestore 데이터를 불러옵니다.
+    LaunchedEffect(Unit) {
+        storeViewModel.loadStores()
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -69,7 +79,10 @@ fun StoreScreen(navController: NavController) {
                 .fillMaxWidth()
                 .padding(vertical = 8.dp)
         )
-        LazyStoreList(storename)
+
+        // 검색어를 포함하여 StoreList를 불러옵니다.
+        LazyStoreList(searchQuery = storename, viewModel = storeViewModel)
     }
 }
+
 

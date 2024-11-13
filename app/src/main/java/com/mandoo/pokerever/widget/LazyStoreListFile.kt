@@ -23,6 +23,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,36 +39,26 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import coil.compose.AsyncImage
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
 import com.mandoo.pokerever.R
 import com.mandoo.pokerever.common.StoreInfo
-import com.mandoo.pokerever.common.StoreInit
 import com.mandoo.pokerever.map.openNaverMap
-import okhttp3.internal.toImmutableList
+import com.mandoo.pokerever.viewmodel.StoreViewModel
 
 @Composable
-fun LazyStoreList(searchQuery: String) {
-    val filteredStores = StoreInit.sortCreateStoreInfoList().filter {
+fun LazyStoreList(searchQuery: String, viewModel: StoreViewModel) {
+    val stores by remember { viewModel.storeList }
+
+    // 검색어 필터링
+    val filteredStores = stores.filter {
         it.storeName.contains(searchQuery, ignoreCase = true)
     }
+
     LazyColumn {
         items(items = filteredStores) { item ->
             StoreListItemUI(storeInfo = item, onItemClick = {})
-        }
-    }
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Spacer(Modifier.height(4.dp))
-        LazyColumn(
-            userScrollEnabled = true //Default
-        ) {
-            items(
-                items = StoreInit.sortCreateStoreInfoList().toImmutableList(),
-//                key = { it.storeName }
-            ) { item ->
-                StoreListItemUI(storeInfo = item, onItemClick = {})
-            }
         }
     }
 }
@@ -76,6 +67,22 @@ fun LazyStoreList(searchQuery: String) {
 fun StoreListItemUI(storeInfo: StoreInfo, onItemClick: (StoreInfo) -> Unit) {
     var isDialogVisible by remember { mutableStateOf(false) }
     val context = LocalContext.current
+    val storageReference: StorageReference =
+        FirebaseStorage.getInstance().getReference(storeInfo.imageRes)
+    var imageUrl by remember { mutableStateOf<String?>(null) }
+    var isLoading by remember { mutableStateOf(true) }
+
+    // 비동기적으로 Firebase에서 이미지 URL을 가져오기
+    LaunchedEffect(storeInfo.imageRes) {
+        storageReference.downloadUrl.addOnSuccessListener { uri ->
+            imageUrl = uri.toString()
+            isLoading = false // 이미지 로딩 완료
+        }.addOnFailureListener {
+            imageUrl = null
+            isLoading = false // 이미지 로딩 실패
+        }
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -96,19 +103,32 @@ fun StoreListItemUI(storeInfo: StoreInfo, onItemClick: (StoreInfo) -> Unit) {
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
+            // 이미지 로딩 상태에 따른 UI 변경
+            if (isLoading) {
+                // 이미지 로딩 중에는 기본 이미지 표시
+                Image(
+                    painter = painterResource(id = R.drawable.mainlogo),
+                    contentDescription = storeInfo.address,
+                    modifier = Modifier
+                        .size(80.dp)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.Crop
+                )
+            } else {
+                // 이미지가 로드된 후에는 AsyncImage 사용
+                AsyncImage(
+                    model = imageUrl, // Firebase Storage에서 가져온 URL을 모델로 사용
+                    contentDescription = storeInfo.address,
+                    modifier = Modifier
+                        .size(80.dp)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.Crop
+                )
+            }
 
-            /**
-             * Network 로 이미지 로딩 시에는 Coil Compose 의 AsyncImage 를 사용
-             */
-            Image(
-                modifier = Modifier
-                    .size(80.dp, 80.dp)
-                    .clip(CircleShape),
-                contentScale = ContentScale.Crop,
-                painter = painterResource(id = storeInfo.imageRes),
-                contentDescription = storeInfo.address,
-            )
             Spacer(modifier = Modifier.width(16.dp))
+
+            // Store name, address 등의 정보 표시
             Column(modifier = Modifier.align(Alignment.CenterVertically)) {
                 Row(
                     modifier = Modifier.padding(end = 16.dp),
@@ -120,49 +140,51 @@ fun StoreListItemUI(storeInfo: StoreInfo, onItemClick: (StoreInfo) -> Unit) {
                         style = typography.bodySmall,
                         color = Color.White
                     )
-                    Spacer(modifier = Modifier.width(1.dp)) // 텍스트 간의 간격
+                    Spacer(modifier = Modifier.width(1.dp))
                     Text(
                         text = storeInfo.storeName,
                         style = typography.bodySmall,
                         color = Color.White
                     )
                 }
+
                 Spacer(modifier = Modifier.height(4.dp))
+
                 Row(
                     modifier = Modifier
-                        .fillMaxWidth() // Row의 전체 너비를 채워 요소를 양쪽 끝에 배치
+                        .fillMaxWidth()
                         .padding(end = 16.dp),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween // 양쪽 끝에 요소 배치
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
                             text = stringResource(id = R.string.store_address),
                             fontWeight = FontWeight.SemiBold,
                             style = typography.bodySmall,
                             color = Color.White
                         )
-                        Spacer(modifier = Modifier.width(1.dp)) // 텍스트 간의 간격
+                        Spacer(modifier = Modifier.width(1.dp))
                         Text(
                             text = storeInfo.address,
                             style = typography.bodySmall,
                             color = Color.White
                         )
                     }
-                    // 아이콘 추가
+
                     Image(
                         painter = painterResource(id = R.drawable.address_icon),
                         contentDescription = null,
                         modifier = Modifier
-                            .size(20.dp) // 아이콘 크기 설정
+                            .size(20.dp)
                             .clickable {
                                 openNaverMap(context, storeInfo.address)
                             }
                     )
                 }
+
                 Spacer(modifier = Modifier.height(4.dp))
+
                 Row(
                     modifier = Modifier.padding(end = 16.dp),
                     verticalAlignment = Alignment.CenterVertically
@@ -173,13 +195,14 @@ fun StoreListItemUI(storeInfo: StoreInfo, onItemClick: (StoreInfo) -> Unit) {
                         style = typography.bodySmall,
                         color = Color.White
                     )
-                    Spacer(modifier = Modifier.width(1.dp)) // 텍스트 간의 간격
+                    Spacer(modifier = Modifier.width(1.dp))
                     Text(
                         text = "${storeInfo.distance}M",
                         style = typography.bodySmall,
                         color = Color.White
                     )
                 }
+
                 if (isDialogVisible) {
                     Dialog(onDismissRequest = { isDialogVisible = false }) {
                         Card(
@@ -196,12 +219,13 @@ fun StoreListItemUI(storeInfo: StoreInfo, onItemClick: (StoreInfo) -> Unit) {
                                     verticalAlignment = Alignment.CenterVertically,
                                     modifier = Modifier.fillMaxWidth()
                                 ) {
-                                    Image(
-                                        painter = painterResource(storeInfo.imageRes), // 매장 이미지 리소스 사용
-                                        contentDescription = null,
+                                    AsyncImage(
+                                        model = imageUrl,
+                                        contentDescription = storeInfo.storeName,
                                         modifier = Modifier
                                             .size(50.dp)
-                                            .clip(CircleShape)
+                                            .clip(CircleShape),
+                                        contentScale = ContentScale.Crop
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Column {
@@ -233,7 +257,7 @@ fun StoreListItemUI(storeInfo: StoreInfo, onItemClick: (StoreInfo) -> Unit) {
                                     Box(
                                         modifier = Modifier
                                             .width(2.dp)
-                                            .height(40.dp) // 구분선의 높이 조절
+                                            .height(40.dp)
                                             .background(Color.Gray)
                                     )
                                     Box(
@@ -257,4 +281,5 @@ fun StoreListItemUI(storeInfo: StoreInfo, onItemClick: (StoreInfo) -> Unit) {
         }
     }
 }
+
 

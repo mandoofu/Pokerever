@@ -22,6 +22,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.mandoo.pokerever.basic.ui.HomeScreen
+import com.mandoo.pokerever.basic.ui.LoginScreen
 import com.mandoo.pokerever.common.sliceNavGraph
 
 @Preview(showBackground = true)
@@ -81,9 +82,8 @@ fun BottomNavigationBarScaffold() {
             startDestination = ScreenRouteDef.HomeTab.routeName,
             modifier = Modifier.padding(paddingValues = paddingValues)
         ) {
-            composable(ScreenRouteDef.HomeTab.routeName) {
-                HomeScreen(navController)
-            }
+            composable(ScreenRouteDef.HomeTab.routeName) { HomeScreen(navController) }
+            composable("login") { LoginScreen(navController) }
             sliceNavGraph(navController)
         }
     }

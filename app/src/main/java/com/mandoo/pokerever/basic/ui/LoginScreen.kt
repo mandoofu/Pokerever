@@ -42,12 +42,17 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.mandoo.pokerever.R
+import com.mandoo.pokerever.viewmodel.LoginViewModel
 
 
 @Composable
 fun LoginScreen(navController: NavController) {
+    val viewModel: LoginViewModel = viewModel()
+    var errorMessage by remember { mutableStateOf<String?>(null) } // 오류 메시지를 저장할 상태
 
     Column(
         modifier = Modifier
@@ -111,14 +116,26 @@ fun LoginScreen(navController: NavController) {
                 }
             },
         )
+        // 오류 메시지 표시
+        errorMessage?.let {
+            Text(
+                text = it,
+                color = Color.Red,
+                fontWeight = FontWeight.Bold,
+                fontSize = 12.sp,
+                modifier = Modifier.padding(top = 8.dp)
+            )
+        }
         Row(
 //            modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
 
-            Text(text = stringResource(R.string.auto_login),
-                color = Color.Gray)
+            Text(
+                text = stringResource(R.string.auto_login),
+                color = Color.Gray
+            )
             var switchState by remember {
                 mutableStateOf(false)
             }
@@ -154,7 +171,19 @@ fun LoginScreen(navController: NavController) {
                 })
         }
         Button(
-            onClick = { navController.navigate("bottom_tab") },
+            onClick = {
+                if (email.isBlank() || pass.isBlank()) {
+                    errorMessage = "이메일과 비밀번호를 모두 입력해주세요." // 오류 메시지 표시
+                } else {
+                    viewModel.loginUser(email, pass) { success ->
+                        if (success) {
+                            navController.navigate("bottom_tab")
+                        } else {
+                            errorMessage = "로그인 실패: 잘못된 이메일 또는 비밀번호" // 실패 시 오류 메시지 설정
+                        }
+                    }
+                }
+            },
             Modifier
                 .width(108.dp)
                 .height(40.dp)

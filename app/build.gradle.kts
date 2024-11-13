@@ -79,7 +79,8 @@ dependencies {
 
     // Hilt 관련 의존성
     implementation(libs.hilt.android.v245)
-    implementation(libs.firebase.auth.ktx)  // 최신 버전
+    implementation(libs.firebase.auth.ktx)
+    implementation(libs.firebase.storage.ktx)  // 최신 버전
     kapt(libs.hilt.android.compiler)
 
     // ViewModel, Compose용 Hilt
