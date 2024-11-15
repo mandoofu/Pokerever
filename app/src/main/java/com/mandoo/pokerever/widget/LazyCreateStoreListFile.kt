@@ -66,9 +66,7 @@ fun LazyCreateStoreList(navController: NavController) {
                             isLike
                         )
                     }
-
                 )
-
             }
         }
     }
