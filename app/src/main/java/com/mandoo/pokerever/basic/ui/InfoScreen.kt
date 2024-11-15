@@ -1,13 +1,11 @@
 package com.mandoo.pokerever.basic.ui
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -176,40 +174,43 @@ fun InfoScreen(navController: NavController) {
             modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End
-            ) {
-                Text(
-                    text = stringResource(R.string.logout),
-                    color = Color.Gray,
-                    modifier = Modifier
-                        .clickable {
-                            // 로그아웃 시 예외 처리 추가
-                            try {
-                                viewModel.logout {
-                                    navController.navigate("login") {
-                                        popUpTo("login") { inclusive = true }
+            /*
+            * 추후 로그아웃&회원탈퇴 부분 UI상단 설정 탭으로 이동하여 구축 예정
+            */
+            /*            Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.End
+                        ) {
+                            Text(
+                                text = stringResource(R.string.logout),
+                                color = Color.Gray,
+                                modifier = Modifier
+                                    .clickable {
+                                        // 로그아웃 시 예외 처리 추가
+                                        try {
+                                            viewModel.logout {
+                                                navController.navigate("login") {
+                                                    popUpTo("login") { inclusive = true }
+                                                }
+                                            }
+                                        } catch (e: Exception) {
+                                            // 로그아웃 중 에러 발생 시 처리
+                                            Log.e("LogoutError", "로그아웃 중 에러 발생: ${e.message}")
+                                            // 에러 메시지 등을 UI에 표시할 수 있습니다.
+                                        }
                                     }
-                                }
-                            } catch (e: Exception) {
-                                // 로그아웃 중 에러 발생 시 처리
-                                Log.e("LogoutError", "로그아웃 중 에러 발생: ${e.message}")
-                                // 에러 메시지 등을 UI에 표시할 수 있습니다.
-                            }
-                        }
-                )
-                Text(
-                    text = " | ", // 구분선 텍스트
-                    color = Color.Gray
-                )
-                Text(
-                    text = stringResource(R.string.user_delete),
-                    color = Color.Gray,
-                    modifier = Modifier
-                        .clickable { }
-                )
-            }
+                            )
+                            Text(
+                                text = " | ", // 구분선 텍스트
+                                color = Color.Gray
+                            )
+                            Text(
+                                text = stringResource(R.string.user_delete),
+                                color = Color.Gray,
+                                modifier = Modifier
+                                    .clickable { }
+                            )
+                        }*/
 
             Button(
                 onClick = {
