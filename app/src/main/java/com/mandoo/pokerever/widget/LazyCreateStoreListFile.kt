@@ -41,50 +41,46 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
 import com.mandoo.pokerever.R
-import com.mandoo.pokerever.common.CreateStoreInfo
-import com.mandoo.pokerever.common.CreateStoreInit
-import okhttp3.internal.toImmutableList
+import com.mandoo.pokerever.common.StoreInfo
 
 @Composable
-fun LazyCreateStoreList(navController: NavController) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+fun LazyCreateStoreList(navController: NavController, stores: List<StoreInfo>) {
+    LazyColumn(
+        modifier = Modifier
+            .padding(8.dp)
+            .fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Spacer(Modifier.height(4.dp))
-        LazyColumn(
-            userScrollEnabled = true //Default
-        ) {
-            items(CreateStoreInit.sortCreateStoreInfoList().toImmutableList()) { item ->
-                CreateStoreListItemUI(
-                    storeInfo = item,
-                    onStoreClick = { storeId -> navController.navigate("store_detail_screen/$storeId") },
-                    onLikeClick = { storeId, isLike ->
-                        CreateStoreInit.updateStoreLikeStatus(
-                            storeId,
-                            isLike
-                        )
-                    }
-                )
-            }
+        items(stores) { store ->
+            CreateStoreListItemUI(
+                storeInfo = store,
+                onStoreClick = { storeId ->
+                    navController.navigate("store_detail_screen/$storeId?storeName=${store.storeName}&address=${store.address}&points=${store.points}")
+                },
+                onLikeClick = { storeId, isLike ->
+                    // 좋아요 상태 업데이트 처리
+                }
+            )
         }
     }
 }
 
 @Composable
 fun CreateStoreListItemUI(
-    storeInfo: CreateStoreInfo,
+    storeInfo: StoreInfo,
     onStoreClick: (storeId: String) -> Unit,
     onLikeClick: (storeId: String, isLike: Boolean) -> Unit
 ) {
+    // 좋아요 상태를 로컬에서 관리
+    var isLiked by remember { mutableStateOf(false) }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .clickable {
-                onStoreClick(storeInfo.id)
-            },
+            .clickable { onStoreClick(storeInfo.sid) },
         shape = RoundedCornerShape(8.dp),
         border = BorderStroke(1.dp, Color.LightGray),
         elevation = CardDefaults.cardElevation(
@@ -98,101 +94,92 @@ fun CreateStoreListItemUI(
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-
-            /**
-             * Network 로 이미지 로딩 시에는 Coil Compose 의 AsyncImage 를 사용
-             */
+            // 매장 이미지
             Image(
+                painter = rememberAsyncImagePainter(storeInfo.imageRes),
+                contentDescription = storeInfo.address,
                 modifier = Modifier
-                    .size(80.dp, 80.dp)
+                    .size(50.dp)
                     .clip(CircleShape),
-                contentScale = ContentScale.Crop,
-                painter = painterResource(id = storeInfo.imageRes),
-                contentDescription = storeInfo.address
+                contentScale = ContentScale.Crop
             )
+
             Spacer(modifier = Modifier.width(16.dp))
-            Column(modifier = Modifier.align(Alignment.CenterVertically)) {
-                Row(
-                    modifier = Modifier.padding(end = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+
+            // 매장 정보 (이름, 주소, 포인트)
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .align(Alignment.CenterVertically)
+            ) {
+                // 매장 이름
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         text = stringResource(id = R.string.store_name),
                         fontWeight = FontWeight.SemiBold,
                         style = typography.bodySmall,
                         color = Color.White
                     )
-                    Spacer(modifier = Modifier.width(1.dp)) // 텍스트 간의 간격
+                    Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = storeInfo.storeName,
                         style = typography.bodySmall,
                         color = Color.White
                     )
                 }
+
                 Spacer(modifier = Modifier.height(4.dp))
-                Row(
-                    modifier = Modifier.padding(end = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+
+                // 매장 주소
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         text = stringResource(id = R.string.store_address),
                         fontWeight = FontWeight.SemiBold,
                         style = typography.bodySmall,
                         color = Color.White
                     )
-                    Spacer(modifier = Modifier.width(1.dp)) // 텍스트 간의 간격
+                    Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = storeInfo.address,
                         style = typography.bodySmall,
                         color = Color.White
                     )
                 }
+
                 Spacer(modifier = Modifier.height(4.dp))
-                Row(
-                    modifier = Modifier.padding(end = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+
+                // 매장 포인트
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         text = stringResource(id = R.string.point),
                         fontWeight = FontWeight.SemiBold,
                         style = typography.bodySmall,
                         color = Color.White
                     )
-                    Spacer(modifier = Modifier.width(1.dp)) // 텍스트 간의 간격
+                    Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = storeInfo.point,
+                        text = "${storeInfo.points}P", // 포인트 표시
                         style = typography.bodySmall,
                         color = Color.White
                     )
                 }
             }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End
-            ) {
-                var isMemberLike by remember { mutableStateOf(storeInfo.isLike) }
-                IconToggleButton(
-                    checked = isMemberLike,
-                    onCheckedChange = {
-                        isMemberLike = !isMemberLike
-                        onLikeClick(storeInfo.id, isMemberLike)
-                    }
-                ) {
-                    Icon(
-                        tint = Color.Red,
-                        modifier = Modifier.graphicsLayer {
-                            scaleX = 1f
-                            scaleY = 1f
-                        },
-                        imageVector = if (isMemberLike) {
-                            Icons.Filled.Favorite
-                        } else {
-                            Icons.Default.FavoriteBorder
-                        },
-                        contentDescription = "좋아요! 유무"
-                    )
+
+            // 좋아요 버튼
+            IconToggleButton(
+                checked = isLiked,
+                onCheckedChange = {
+                    isLiked = !isLiked
+                    onLikeClick(storeInfo.sid, isLiked)
                 }
+            ) {
+                Icon(
+                    imageVector = if (isLiked) Icons.Filled.Favorite else Icons.Default.FavoriteBorder,
+                    contentDescription = "좋아요 상태",
+                    tint = if (isLiked) Color.Red else Color.Gray
+                )
             }
         }
     }
 }
+

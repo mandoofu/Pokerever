@@ -11,6 +11,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,18 +29,20 @@ import com.mandoo.pokerever.widget.LazyCreateStoreList
 fun HomeScreen(navController: NavController) {
     val viewModel: HomeViewModel = viewModel()
     val userInfoState = viewModel.userInfoState.value
+    val userAddedStores by viewModel.userAddedStores
 
-    // 화면이 처음 로드될 때 사용자 정보 가져오기
+    // 사용자 ID를 가져오고, 추가한 매장을 로드
     LaunchedEffect(Unit) {
+        val userId = viewModel.getUserId() ?: return@LaunchedEffect
         viewModel.fetchUserInfo()
+        viewModel.fetchUserAddedStores(userId)
     }
 
-    // 로딩 중이면 로딩 UI 표시
+    // 로딩 중 UI 표시
     if (userInfoState.isLoading) {
-        // 로딩 중 UI, 예: ProgressIndicator
-        SplashScreen()
+        SplashScreen() // 로딩 중 화면
     } else {
-        // 사용자 정보가 로드되었으면 UI에 표시
+        // 사용자 정보와 추가한 매장을 표시
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -48,15 +51,16 @@ fun HomeScreen(navController: NavController) {
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.Start
         ) {
+            // 사용자 정보 표시
             Row(verticalAlignment = Alignment.Bottom) {
                 Text(
-                    text = userInfoState.name ?: "이름 없음", // name을 보여주기
+                    text = userInfoState.name ?: "이름 없음",
                     color = Color.White,
                     fontWeight = FontWeight.Bold,
                     fontSize = 24.sp
                 )
                 Text(
-                    text = "(${userInfoState.nickname})", // nickname을 괄호로 묶어 보여주기
+                    text = "(${userInfoState.nickname})",
                     color = Color.White,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
@@ -70,6 +74,7 @@ fun HomeScreen(navController: NavController) {
                     modifier = Modifier.padding(start = 4.dp)
                 )
             }
+
             HorizontalDivider(
                 color = Color.White,
                 thickness = 2.dp,
@@ -77,6 +82,8 @@ fun HomeScreen(navController: NavController) {
                     .fillMaxWidth()
                     .padding(vertical = 4.dp)
             )
+
+            // 추가된 매장 목록 표시
             Row(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -89,8 +96,9 @@ fun HomeScreen(navController: NavController) {
                     fontSize = 16.sp
                 )
             }
-            LazyCreateStoreList(navController)
+
+            // LazyCreateStoreList로 사용자 추가 매장 표시
+            LazyCreateStoreList(navController = navController, stores = userAddedStores)
         }
     }
 }
-

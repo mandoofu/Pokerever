@@ -40,6 +40,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import coil.compose.AsyncImage
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.mandoo.pokerever.R
@@ -50,18 +51,23 @@ import com.mandoo.pokerever.viewmodel.StoreViewModel
 @Composable
 fun LazyStoreList(searchQuery: String, viewModel: StoreViewModel) {
     val stores by remember { viewModel.storeList }
+    val userAddedStores by remember { viewModel.userAddedStores }
 
-    // 검색어 필터링
-    val filteredStores = stores.filter {
-        it.storeName.contains(searchQuery, ignoreCase = true)
+    // 유저가 추가하지 않은 매장 필터링
+    val filteredStores = stores.filter { store ->
+        store.sid !in userAddedStores
     }
 
     LazyColumn {
-        items(items = filteredStores) { item ->
-            StoreListItemUI(storeInfo = item, onItemClick = {})
+        items(filteredStores) { store ->
+            StoreListItemUI(storeInfo = store, onItemClick = {
+                val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return@StoreListItemUI
+                viewModel.addStoreForUser(userId, store) // 매장 추가
+            })
         }
     }
 }
+
 
 @Composable
 fun StoreListItemUI(storeInfo: StoreInfo, onItemClick: (StoreInfo) -> Unit) {
@@ -87,9 +93,7 @@ fun StoreListItemUI(storeInfo: StoreInfo, onItemClick: (StoreInfo) -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .clickable {
-                isDialogVisible = true
-            },
+            .clickable { isDialogVisible = true },
         shape = RoundedCornerShape(8.dp),
         border = BorderStroke(1.dp, Color.LightGray),
         elevation = CardDefaults.cardElevation(
@@ -105,7 +109,6 @@ fun StoreListItemUI(storeInfo: StoreInfo, onItemClick: (StoreInfo) -> Unit) {
         ) {
             // 이미지 로딩 상태에 따른 UI 변경
             if (isLoading) {
-                // 이미지 로딩 중에는 기본 이미지 표시
                 Image(
                     painter = painterResource(id = R.drawable.mainlogo),
                     contentDescription = storeInfo.address,
@@ -115,9 +118,8 @@ fun StoreListItemUI(storeInfo: StoreInfo, onItemClick: (StoreInfo) -> Unit) {
                     contentScale = ContentScale.Crop
                 )
             } else {
-                // 이미지가 로드된 후에는 AsyncImage 사용
                 AsyncImage(
-                    model = imageUrl, // Firebase Storage에서 가져온 URL을 모델로 사용
+                    model = imageUrl,
                     contentDescription = storeInfo.address,
                     modifier = Modifier
                         .size(80.dp)
@@ -128,7 +130,6 @@ fun StoreListItemUI(storeInfo: StoreInfo, onItemClick: (StoreInfo) -> Unit) {
 
             Spacer(modifier = Modifier.width(16.dp))
 
-            // Store name, address 등의 정보 표시
             Column(modifier = Modifier.align(Alignment.CenterVertically)) {
                 Row(
                     modifier = Modifier.padding(end = 16.dp),
@@ -281,5 +282,3 @@ fun StoreListItemUI(storeInfo: StoreInfo, onItemClick: (StoreInfo) -> Unit) {
         }
     }
 }
-
-

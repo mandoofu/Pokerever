@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.mandoo.pokerever.common.StoreInfo
 import com.mandoo.pokerever.model.UserInfoState
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -16,7 +17,40 @@ class HomeViewModel : ViewModel() {
     private val firestore = FirebaseFirestore.getInstance()
 
     var userInfoState: MutableState<UserInfoState> = mutableStateOf(UserInfoState())
+    fun getUserId(): String? {
+        return auth.currentUser?.uid
+    }
 
+    fun fetchUserAddedStores(userId: String) {
+        viewModelScope.launch {
+            firestore.collection("users")
+                .document(userId)
+                .collection("addedStores")
+                .get()
+                .addOnSuccessListener { documents ->
+                    val storeIds = documents.map { it.id }
+                    if (storeIds.isNotEmpty()) {
+                        firestore.collection("stores")
+                            .whereIn("sid", storeIds)
+                            .get()
+                            .addOnSuccessListener { snapshot ->
+                                val stores = snapshot.toObjects(StoreInfo::class.java)
+                                userAddedStores.value = stores
+                            }
+                            .addOnFailureListener { e ->
+                                Log.e("HomeViewModel", "Failed to fetch stores: $e")
+                            }
+                    }
+                }
+                .addOnFailureListener { e ->
+                    Log.e("HomeViewModel", "Failed to fetch user added stores: $e")
+                }
+        }
+    }
+
+
+    // 사용자가 추가한 매장 목록 상태
+    val userAddedStores = mutableStateOf<List<StoreInfo>>(emptyList())
     // 로그인한 사용자 정보를 Firestore에서 가져오는 함수
     fun fetchUserInfo() {
         val userId = auth.currentUser?.uid
