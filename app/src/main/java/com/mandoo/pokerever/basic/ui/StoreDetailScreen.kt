@@ -39,12 +39,19 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import com.mandoo.pokerever.R
-import com.mandoo.pokerever.common.CreateStoreInfo
-
+import com.mandoo.pokerever.common.StoreInfo
+import com.mandoo.pokerever.utils.sendPoints
 
 @Composable
-fun StoreDetailScreen(navController: NavController, sroreInfo: CreateStoreInfo) {
+fun StoreDetailScreen(
+    navController: NavController,
+    storeInfo: StoreInfo,
+    userId: String
+) {
     var isDialogVisible by remember { mutableStateOf(false) }
+    var pointInput by remember { mutableStateOf("") } // 다이얼로그 입력 포인트
+    val isInputValid = pointInput.toIntOrNull()?.let { it in 1..storeInfo.points } ?: false // 입력값 검증
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -52,13 +59,12 @@ fun StoreDetailScreen(navController: NavController, sroreInfo: CreateStoreInfo) 
             .padding(16.dp),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.Start
-    )
-    {
+    ) {
+        // 상단 매장 정보 헤더
         Box(
             modifier = Modifier
-                .fillMaxWidth(),
-
-            ) {
+                .fillMaxWidth()
+        ) {
             Image(
                 painter = painterResource(id = R.drawable.arrow_icon),
                 contentDescription = null,
@@ -68,13 +74,15 @@ fun StoreDetailScreen(navController: NavController, sroreInfo: CreateStoreInfo) 
                     .align(Alignment.CenterStart)
             )
             Text(
-                text = "홀스 신림점", //Store name 데이터 rest 추가 부분
+                text = storeInfo.storeName, // 매장 이름
                 color = Color.White,
                 fontWeight = FontWeight.Bold,
                 fontSize = 24.sp,
                 modifier = Modifier.align(Alignment.Center)
             )
         }
+
+        // 구분선
         HorizontalDivider(
             color = Color.White,
             thickness = 2.dp,
@@ -82,36 +90,36 @@ fun StoreDetailScreen(navController: NavController, sroreInfo: CreateStoreInfo) 
                 .fillMaxWidth()
                 .padding(vertical = 4.dp)
         )
+
         val pointInfoTextStyle = TextStyle(
             color = Color.White,
             fontWeight = FontWeight.Medium,
             fontSize = 16.sp
         )
+
+        // 포인트 정보 표시
         Row(
             modifier = Modifier
-                .fillMaxWidth() // Row의 전체 너비를 채워 요소를 양쪽 끝에 배치
+                .fillMaxWidth()
                 .padding(end = 16.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween // 양쪽 끝에 요소 배치
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(text = stringResource(R.string.user_point), style = pointInfoTextStyle)
-                Spacer(modifier = Modifier.width(1.dp)) // 텍스트 간의 간격
-                Text(text = ("100"), style = pointInfoTextStyle) //매장 별 고객 포인트 정보 표출)
-                Text(text = ("p"), style = pointInfoTextStyle)
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(text = "${storeInfo.points}p", style = pointInfoTextStyle) // 보유 포인트 표시
             }
-            // 아이콘 추가
             Image(
                 painter = painterResource(id = R.drawable.user_point_icon),
                 contentDescription = null,
                 modifier = Modifier
-                    .size(28.dp) // 아이콘 크기 설정
-                    .clickable { isDialogVisible = true }
+                    .size(28.dp)
+                    .clickable { isDialogVisible = true } // 다이얼로그 표시
             )
         }
 
+        // 구분선
         HorizontalDivider(
             color = Color.White,
             thickness = 0.4.dp,
@@ -119,22 +127,25 @@ fun StoreDetailScreen(navController: NavController, sroreInfo: CreateStoreInfo) 
                 .fillMaxWidth()
                 .padding(vertical = 8.dp)
         )
-        val recevingPointInfoTextStyle = TextStyle(
+
+        val receivingPointInfoTextStyle = TextStyle(
             color = Color.White,
             fontWeight = FontWeight.Medium,
             fontSize = 12.sp
         )
+
+        // 포인트 송신 내역 헤더 (표시용)
         Row(
             verticalAlignment = Alignment.Bottom,
             horizontalArrangement = Arrangement.spacedBy(72.dp)
         ) {
-            Text(text = stringResource(R.string.from_user), style = recevingPointInfoTextStyle)
-            Text(text = stringResource(R.string.recipient_user), style = recevingPointInfoTextStyle)
-            Text(text = stringResource(R.string.time), style = recevingPointInfoTextStyle)
-            Text(text = stringResource(R.string.quantity), style = recevingPointInfoTextStyle)
+            Text(text = stringResource(R.string.from_user), style = receivingPointInfoTextStyle)
+            Text(text = stringResource(R.string.recipient_user), style = receivingPointInfoTextStyle)
+            Text(text = stringResource(R.string.time), style = receivingPointInfoTextStyle)
+            Text(text = stringResource(R.string.quantity), style = receivingPointInfoTextStyle)
         }
 
-// 다이얼로그 표시
+        // 포인트 전송 다이얼로그
         if (isDialogVisible) {
             Dialog(onDismissRequest = { isDialogVisible = false }) {
                 Card(
@@ -147,9 +158,9 @@ fun StoreDetailScreen(navController: NavController, sroreInfo: CreateStoreInfo) 
                             .padding(16.dp)
                             .width(250.dp)
                     ) {
-                        // 상단 제목과 포인트 정보
+                        // 다이얼로그 제목
                         Text(
-                            text = "포인트 전송",
+                            text = stringResource(R.string.send_points),
                             fontSize = 18.sp,
                             color = Color.Black,
                             fontWeight = FontWeight.Bold,
@@ -158,12 +169,12 @@ fun StoreDetailScreen(navController: NavController, sroreInfo: CreateStoreInfo) 
 
                         Spacer(modifier = Modifier.height(16.dp))
 
+                        // 포인트 입력 필드
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.Center
                         ) {
-                            // 포인트 아이콘
                             Image(
                                 painter = painterResource(id = R.drawable.user_point_icon),
                                 contentDescription = null,
@@ -173,15 +184,12 @@ fun StoreDetailScreen(navController: NavController, sroreInfo: CreateStoreInfo) 
 
                             Spacer(modifier = Modifier.width(8.dp))
 
-                            // 포인트 입력 필드
-                            var pointInput by remember { mutableStateOf("") } // 초기값 설정
-
                             Box(
                                 modifier = Modifier
                                     .width(140.dp)
                                     .height(40.dp)
-                                    .border(1.dp, Color.Gray, RoundedCornerShape(8.dp)) // 외곽선 추가
-                                    .padding(horizontal = 4.dp, vertical = 2.dp) // 기본 패딩 최소화
+                                    .border(1.dp, Color.Gray, RoundedCornerShape(8.dp))
+                                    .padding(horizontal = 4.dp, vertical = 2.dp)
                             ) {
                                 BasicTextField(
                                     value = pointInput,
@@ -194,14 +202,14 @@ fun StoreDetailScreen(navController: NavController, sroreInfo: CreateStoreInfo) 
                                     decorationBox = { innerTextField ->
                                         if (pointInput.isEmpty()) {
                                             Text(
-                                                "10p",
+                                                text = "10p",
                                                 style = TextStyle(
                                                     color = Color.LightGray,
                                                     fontSize = 16.sp
                                                 )
                                             )
                                         }
-                                        innerTextField() // 실제 입력란
+                                        innerTextField()
                                     },
                                     modifier = Modifier
                                         .fillMaxSize()
@@ -212,44 +220,30 @@ fun StoreDetailScreen(navController: NavController, sroreInfo: CreateStoreInfo) 
 
                         Spacer(modifier = Modifier.height(24.dp))
 
-                        // 버튼 행
+                        // 다이얼로그 버튼
                         Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(Color.LightGray)
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            // "취소" 버튼
-                            Box(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .clickable { isDialogVisible = false }
-                                    .padding(vertical = 8.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(text = "취소", color = Color.Black)
-                            }
-
-                            // 구분선
-                            Box(
-                                modifier = Modifier
-                                    .width(1.dp)
-                                    .height(40.dp) // 구분선의 높이 설정
-                                    .background(Color.Gray)
+                            Text(
+                                text = stringResource(R.string.cancel),
+                                color = Color.Gray,
+                                modifier = Modifier.clickable { isDialogVisible = false }
                             )
-
-                            // "전송" 버튼
-                            Box(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .clickable {
-                                        // 전송 버튼 클릭 시 동작 추가 가능
-                                        isDialogVisible = false
-                                    }
-                                    .padding(vertical = 8.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(text = "전송", color = Color.Black)
-                            }
+                            Text(
+                                text = stringResource(R.string.send),
+                                color = if (isInputValid) Color.Blue else Color.Gray,
+                                modifier = Modifier.clickable(enabled = isInputValid) {
+                                    isDialogVisible = false
+                                    sendPoints(
+                                        userId = userId,
+                                        storeId = storeInfo.sid,
+                                        points = pointInput.toInt(),
+                                        onSuccess = { /* 성공 처리 */ },
+                                        onFailure = { /* 실패 처리 */ }
+                                    )
+                                }
+                            )
                         }
                     }
                 }

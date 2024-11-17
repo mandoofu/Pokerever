@@ -40,6 +40,15 @@
     <string name="store_name">매장명 : </string>
     <string name="store_address">주소 : </string>
     <string name="store_distance">거리 : </string>
+    <string name="no_added_stores">추가된 매장이 없습니다.</string>
+    <string name="send_points">포인트 전송</string>
+    <string name="cancel">취소</string>
+    <string name="add">추가</string>
+    <string name="send">전송</string>
+
+
+
+
 
 
 </resources>

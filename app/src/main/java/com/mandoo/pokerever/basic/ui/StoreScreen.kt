@@ -1,6 +1,5 @@
 package com.mandoo.pokerever.basic.ui
 
-
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -38,7 +37,10 @@ import com.mandoo.pokerever.widget.LazyStoreList
 fun StoreScreen(navController: NavController) {
     val storeViewModel: StoreViewModel = viewModel()
 
-    // 화면이 시작될 때 Firestore 데이터를 불러옵니다.
+    // 현재 사용자 ID 가져오기
+    val userId = storeViewModel.getUserId() ?: ""
+
+    // Firestore에서 매장 정보를 로드
     LaunchedEffect(Unit) {
         storeViewModel.loadStores()
     }
@@ -52,9 +54,11 @@ fun StoreScreen(navController: NavController) {
         horizontalAlignment = Alignment.Start
     ) {
         var storename by remember { mutableStateOf("") }
+
+        // 검색 입력 필드
         OutlinedTextField(
             value = storename,
-            onValueChange = { newText -> storename = newText },
+            onValueChange = { storename = it },
             label = { Text(text = stringResource(R.string.search_store)) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
             singleLine = true,
@@ -66,7 +70,7 @@ fun StoreScreen(navController: NavController) {
                 Image(
                     painter = painterResource(id = R.drawable.search_icon),
                     contentDescription = null,
-                    modifier = Modifier.padding(end = 8.dp) // 아이콘과 텍스트 간 간격 조정
+                    modifier = Modifier.padding(end = 8.dp)
                 )
             },
             textStyle = TextStyle(color = Color.White)
@@ -80,9 +84,10 @@ fun StoreScreen(navController: NavController) {
                 .padding(vertical = 8.dp)
         )
 
-        // 검색어를 포함하여 StoreList를 불러옵니다.
-        LazyStoreList(searchQuery = storename, viewModel = storeViewModel)
+        // 검색어 및 필터링된 매장을 LazyStoreList로 표시
+        LazyStoreList(
+            searchQuery = storename,
+            viewModel = storeViewModel
+        )
     }
 }
-
-

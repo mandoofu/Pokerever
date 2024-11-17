@@ -4,50 +4,88 @@ import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import com.mandoo.pokerever.common.StoreInfo
 import com.mandoo.pokerever.common.getStoresFromFirestore
+import com.mandoo.pokerever.utils.addStoreToUser
+import com.mandoo.pokerever.utils.initializeUserStorePoints
 import kotlinx.coroutines.launch
 
 class StoreViewModel : ViewModel() {
-    var storeList = mutableStateOf<List<StoreInfo>>(emptyList())
-    var imageUrl = mutableStateOf<String>("")  // 이미지 URL 상태 추가
+    private val db = FirebaseFirestore.getInstance()
+    private val auth = FirebaseAuth.getInstance()
 
-    // Firebase Storage에서 이미지 URL 가져오기
-    fun loadImage(imagePath: String) {
-        val storage = Firebase.storage
-        val storageReference = storage.reference.child(imagePath)
+    var storeList = mutableStateOf<List<StoreInfo>>(emptyList()) // 모든 매장
+    var userAddedStores = mutableStateOf<List<String>>(emptyList()) // 유저가 추가한 매장 ID
 
-        storageReference.downloadUrl.addOnSuccessListener { uri ->
-            // 이미지 URL을 상태로 저장
-            imageUrl.value = uri.toString()
-            Log.d("StoreViewModel", "Image URL loaded: $imageUrl")
-        }.addOnFailureListener {
-            // 오류 처리
-            imageUrl.value = ""  // 오류 발생 시 빈 문자열로 설정
-            Log.e("StoreViewModel", "Failed to load image URL", it)
-        }
+    fun getUserId(): String? {
+        return auth.currentUser?.uid
     }
 
-    // Firestore에서 매장 정보 가져오기
+
+    // 모든 매장 로드
     fun loadStores() {
         viewModelScope.launch {
-            Log.d("StoreViewModel", "Attempting to load stores from Firestore")
             getStoresFromFirestore { stores ->
-                if (stores.isNotEmpty()) {
-                    Log.d("StoreViewModel", "Successfully loaded ${stores.size} stores")
-                    storeList.value = stores
-
-                    // 각 매장의 이미지 URL을 로드 (imageRes 필드를 사용)
-                    stores.forEach { store ->
-                        loadImage(store.imageRes)  // 각 매장에 대해 이미지를 로드
-                    }
-                } else {
-                    Log.d("StoreViewModel", "No stores found")
-                    storeList.value = emptyList()
-                }
+                storeList.value = stores
             }
         }
     }
+
+    // 유저가 추가한 매장 로드
+    fun loadUserAddedStores(userId: String) {
+        db.collection("users").document(userId).collection("addedStores")
+            .get()
+            .addOnSuccessListener { result ->
+                val addedStoreIds = result.documents.map { it.id }
+                userAddedStores.value = addedStoreIds
+            }
+    }
+
+    // 유저가 매장을 추가
+    fun addStoreForUser(userId: String, storeInfo: StoreInfo) {
+        viewModelScope.launch {
+            val storeRef = db.collection("stores").document(storeInfo.sid)
+
+            storeRef.set(storeInfo)
+                .addOnSuccessListener {
+                    addStoreToUser(
+                        userId = userId,
+                        storeId = storeInfo.sid,
+                        onSuccess = {
+                            initializeUserStorePoints(
+                                userId = userId,
+                                storeId = storeInfo.sid,
+                                onSuccess = {
+                                    // 데이터 갱신
+                                    loadUserAddedStores(userId) // 추가된 매장을 다시 로드
+                                    loadStores() // LazyStoreList UI 갱신
+                                },
+                                onFailure = { error ->
+                                    Log.e("StoreViewModel", "Failed to initialize points: $error")
+                                }
+                            )
+                        },
+                        onFailure = { error ->
+                            Log.e("StoreViewModel", "Failed to add store to user: $error")
+                        }
+                    )
+                }
+                .addOnFailureListener { e ->
+                    Log.e("StoreViewModel", "Failed to add store: ${e.localizedMessage}")
+                }
+        }
+    }
+
+
+    // 모든 데이터를 초기화
+    fun initializeData() {
+        val userId = auth.currentUser?.uid ?: return
+        loadStores()
+        loadUserAddedStores(userId)
+    }
 }
+

@@ -6,5 +6,6 @@ data class StoreInfo(
     val storeName: String = "",
     val address: String = "",
     val imageRes: String = "",
-    val distance: String = ""
+    val distance: String = "",
+    val points: Int = 0
 )
