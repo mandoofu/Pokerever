@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Pokerever</string>
+    <string name="app_name">포커에버</string>
     <string name="title_activity_home_screen">HomeScreen</string>
     <string name="title_activity_info_screen">InfoScreen</string>
     <string name="title_activity_login_screen">LoginScreen</string>

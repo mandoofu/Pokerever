@@ -58,16 +58,23 @@ fun RegisterScreen(navController: NavController) {
 
         var name by remember { mutableStateOf("") }
         var nameError by remember { mutableStateOf("") }
+
         OutlinedTextField(
             value = name,
-            onValueChange = { newText -> name = newText },
+            onValueChange = { newText ->
+                name = newText
+                nameError = if (!ValidationUtil.isValidName(newText)) {
+                    "이름은 2자 이상이며, 한글 또는 알파벳만 사용할 수 있습니다."
+                } else {
+                    ""
+                }
+            },
             label = { Text(text = stringResource(R.string.name)) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
             textStyle = TextStyle(color = Color.White)
         )
-        nameError = if (name.isNotEmpty() && name.length < 2) "이름은 2자 이상이어야 합니다." else ""
 
         Text(
             text = nameError,
@@ -88,8 +95,12 @@ fun RegisterScreen(navController: NavController) {
         ) {
             OutlinedTextField(
                 value = frontNumber,
-                onValueChange = { newText -> frontNumber = newText },
-                label = { Text(text = "생년월일") },
+                onValueChange = { newText ->
+                    if (newText.length <= 6 && newText.all { it.isDigit() }) {
+                        frontNumber = newText
+                    }
+                },
+                label = { Text(text = "생년월일", fontSize = 12.sp) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 singleLine = true,
                 modifier = Modifier.weight(0.5f),
@@ -107,32 +118,37 @@ fun RegisterScreen(navController: NavController) {
                         backNumber = newValue[0].toString()
                     }
                 },
-                label = { Text(text = "주민번호 뒷자리") },
+                label = { Text(text = "주민번호 뒷자리", fontSize = 12.sp) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 singleLine = true,
                 modifier = Modifier.weight(0.5f),
                 textStyle = TextStyle(color = Color.White)
             )
         }
 
-        registrationNumberError =
-            if (frontNumber.isNotEmpty() && backNumber.isNotEmpty() && !ValidationUtil.isValidRegistrationNumber(
-                    "$frontNumber-$backNumber"
-                )
-            ) {
-                "유효하지 않은 주민등록번호입니다."
-            } else {
-                ""
+        // 유효성 검사 로직
+        registrationNumberError = when {
+            frontNumber.isEmpty() || backNumber.isEmpty() -> "생년월일과 주민번호 뒷자리를 입력해주세요."
+            frontNumber.length != 6 -> "생년월일은 6자리여야 합니다."
+            !ValidationUtil.isValidRegistrationNumber(
+                frontNumber,
+                backNumber
+            ) -> "유효하지 않은 주민등록번호입니다."
+
+            else -> ""
         }
 
         Text(
             text = registrationNumberError,
-            color = Color.Red,
+            color = if (registrationNumberError.isEmpty()) Color.Transparent else Color.Red,
             fontSize = 12.sp,
             modifier = Modifier.padding(top = 4.dp)
         )
 
+// 닉네임 입력 및 중복 확인
         var nickname by remember { mutableStateOf("") }
         var nicknameError by remember { mutableStateOf("") }
+        val isDuplicate by viewModel.isDuplicate // ViewModel에서 상태 가져오기
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -140,7 +156,14 @@ fun RegisterScreen(navController: NavController) {
         ) {
             OutlinedTextField(
                 value = nickname,
-                onValueChange = { newText -> nickname = newText },
+                onValueChange = { newText ->
+                    nickname = newText
+                    nicknameError = if (!ValidationUtil.isValidNickname(newText)) {
+                        "닉네임은 2~6자이며, 한글, 알파벳만 사용할 수 있습니다."
+                    } else {
+                        ""
+                    }
+                },
                 label = { Text(text = stringResource(R.string.nick_name)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                 singleLine = true,
@@ -149,11 +172,15 @@ fun RegisterScreen(navController: NavController) {
             )
             OutlinedButton(
                 onClick = {
-                    viewModel.checkDuplicateNickname(nickname)
+                    if (ValidationUtil.isValidNickname(nickname)) {
+                        viewModel.checkDuplicateNickname(nickname)
+                    } else {
+                        nicknameError = "유효한 닉네임을 입력하세요."
+                    }
                 },
                 modifier = Modifier
                     .padding(start = 8.dp, top = 8.dp)
-                    .height(40.dp), // TextField 높이와 동일하게 설정
+                    .height(40.dp)
             ) {
                 Text(
                     text = stringResource(R.string.duplicate_check),
@@ -163,30 +190,29 @@ fun RegisterScreen(navController: NavController) {
             }
         }
 
-        // 닉네임 유효성 검사 및 중복 확인
-        nicknameError = if (nickname.isEmpty()) {
-            "닉네임을 입력해주세요."
-        } else {
-            if (viewModel.isDuplicate != null) {
-                if (viewModel.isDuplicate == true) {
-                    "닉네임이 이미 존재합니다."
-                } else {
-                    "사용 가능한 닉네임입니다."
-                }
-            } else {
-                ""
-            }
+        val nicknameFinalError = when {
+            nickname.isEmpty() -> "닉네임을 입력해주세요."
+            nicknameError.isNotEmpty() -> nicknameError
+            isDuplicate == true -> "닉네임이 이미 존재합니다."
+            isDuplicate == false -> "사용 가능한 닉네임입니다."
+            else -> ""
         }
 
         Text(
-            text = nicknameError,
-            color = if (viewModel.isDuplicate == true) Color.Red else Color.Green,
+            text = nicknameFinalError,
+            color = when {
+                nicknameFinalError.contains("사용 가능") -> Color.Green
+                nicknameFinalError.isNotEmpty() -> Color.Red
+                else -> Color.Transparent
+            },
             fontSize = 12.sp,
             modifier = Modifier.padding(top = 4.dp)
         )
 
+// 이메일 입력 및 중복 확인
         var email by remember { mutableStateOf("") }
         var emailError by remember { mutableStateOf("") }
+        val isEmailDuplicate by viewModel.isEmailDuplicate // ViewModel에서 상태 가져오기
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -194,7 +220,14 @@ fun RegisterScreen(navController: NavController) {
         ) {
             OutlinedTextField(
                 value = email,
-                onValueChange = { newText -> email = newText },
+                onValueChange = { newText ->
+                    email = newText
+                    emailError = if (!ValidationUtil.isValidEmail(newText)) {
+                        "유효한 이메일 형식을 입력해주세요."
+                    } else {
+                        ""
+                    }
+                },
                 label = { Text(text = stringResource(R.string.email)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 singleLine = true,
@@ -203,11 +236,15 @@ fun RegisterScreen(navController: NavController) {
             )
             OutlinedButton(
                 onClick = {
-                    viewModel.checkDuplicateEmail(email)
+                    if (ValidationUtil.isValidEmail(email)) {
+                        viewModel.checkDuplicateEmail(email)
+                    } else {
+                        emailError = "유효한 이메일 형식을 입력하세요."
+                    }
                 },
                 modifier = Modifier
                     .padding(start = 8.dp, top = 8.dp)
-                    .height(40.dp), // TextField 높이와 동일하게 설정
+                    .height(40.dp)
             ) {
                 Text(
                     text = stringResource(R.string.duplicate_check),
@@ -217,24 +254,21 @@ fun RegisterScreen(navController: NavController) {
             }
         }
 
-        // 이메일 유효성 검사 및 중복 확인
-        emailError = if (email.isEmpty()) {
-            "이메일을 입력해주세요."
-        } else {
-            if (viewModel.isEmailDuplicate != null) {
-                if (viewModel.isEmailDuplicate == true) {
-                    "이메일이 이미 존재합니다."
-                } else {
-                    "사용 가능한 이메일입니다."
-                }
-            } else {
-                ""
-            }
+        val emailFinalError = when {
+            email.isEmpty() -> "이메일을 입력해주세요."
+            emailError.isNotEmpty() -> emailError
+            isEmailDuplicate == true -> "이메일이 이미 존재합니다."
+            isEmailDuplicate == false -> "사용 가능한 이메일입니다."
+            else -> ""
         }
 
         Text(
-            text = emailError,
-            color = if (viewModel.isEmailDuplicate == true) Color.Red else Color.Green,
+            text = emailFinalError,
+            color = when {
+                emailFinalError.contains("사용 가능") -> Color.Green
+                emailFinalError.isNotEmpty() -> Color.Red
+                else -> Color.Transparent
+            },
             fontSize = 12.sp,
             modifier = Modifier.padding(top = 4.dp)
         )
