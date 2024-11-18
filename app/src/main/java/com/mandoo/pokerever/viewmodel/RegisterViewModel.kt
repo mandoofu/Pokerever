@@ -1,6 +1,6 @@
 package com.mandoo.pokerever.viewmodel
 
-import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
@@ -13,9 +13,12 @@ class RegisterViewModel : ViewModel() {
     private val auth = FirebaseAuth.getInstance()
     private val db = FirebaseFirestore.getInstance()
 
-    // 이메일 중복 체크 상태
-    var isEmailDuplicate: Boolean? = null
-    var isDuplicate: Boolean? = null
+    // 이메일 및 닉네임 중복 체크 상태
+    var isEmailDuplicate = mutableStateOf<Boolean?>(null)
+        private set
+
+    var isDuplicate = mutableStateOf<Boolean?>(null)
+        private set
 
     // 유저 등록 함수
     fun registerUser(
@@ -28,7 +31,7 @@ class RegisterViewModel : ViewModel() {
     ) {
         viewModelScope.launch {
             try {
-                // 이메일로 Firebase Authentication을 사용하여 회원가입 진행
+                // Firebase Authentication으로 회원가입
                 val userCredential = auth.createUserWithEmailAndPassword(email, password).await()
 
                 // Firestore에 사용자 정보 저장
@@ -41,39 +44,48 @@ class RegisterViewModel : ViewModel() {
                     "uid" to userCredential.user?.uid
                 )
 
-                db.collection("users") // "users" 컬렉션에 저장
+                db.collection("users")
                     .document(userCredential.user?.uid ?: "")
                     .set(user)
                     .addOnSuccessListener {
-                        Log.d("RegisterViewModel", "User successfully registered")
+                        // 회원가입 성공 처리
                     }
                     .addOnFailureListener { e ->
-                        Log.w("RegisterViewModel", "Error adding user", e)
+                        // 에러 처리
                     }
-
             } catch (e: Exception) {
-                Log.e("RegisterViewModel", "Registration failed: ${e.message}")
+                // 예외 처리
             }
         }
     }
 
-    // 이메일 중복 체크 함수
+    // 이메일 중복 확인 함수
     fun checkDuplicateEmail(email: String) {
-        db.collection("users")
-            .whereEqualTo("email", email)
-            .get()
-            .addOnSuccessListener { result ->
-                isEmailDuplicate = !result.isEmpty
+        viewModelScope.launch {
+            try {
+                val query = db.collection("users")
+                    .whereEqualTo("email", email)
+                    .get()
+                    .await()
+                isEmailDuplicate.value = !query.isEmpty
+            } catch (e: Exception) {
+                isEmailDuplicate.value = null
             }
+        }
     }
 
-    // 닉네임 중복 체크 함수
+    // 닉네임 중복 확인 함수
     fun checkDuplicateNickname(nickname: String) {
-        db.collection("users")
-            .whereEqualTo("nickname", nickname)
-            .get()
-            .addOnSuccessListener { result ->
-                isDuplicate = !result.isEmpty
+        viewModelScope.launch {
+            try {
+                val query = db.collection("users")
+                    .whereEqualTo("nickname", nickname)
+                    .get()
+                    .await()
+                isDuplicate.value = !query.isEmpty
+            } catch (e: Exception) {
+                isDuplicate.value = null
             }
+        }
     }
 }
