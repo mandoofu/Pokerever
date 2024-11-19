@@ -3,7 +3,6 @@ package com.mandoo.pokerever.widget
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -34,9 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -47,24 +44,18 @@ import com.mandoo.pokerever.common.StoreInfo
 
 @Composable
 fun LazyCreateStoreList(navController: NavController, stores: List<StoreInfo>) {
-    LazyColumn(
-        modifier = Modifier
-            .padding(8.dp)
-            .fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
+    LazyColumn {
         items(stores) { store ->
             CreateStoreListItemUI(
                 storeInfo = store,
                 onStoreClick = { storeId ->
-                    navController.navigate("store_detail_screen/$storeId?storeName=${store.storeName}&address=${store.address}&points=${store.points}")
+                    navController.navigate("store_detail_screen/$storeId")
                 },
-                onLikeClick = { storeId, isLike ->
-                    // 좋아요 상태 업데이트 처리
-                }
+                onLikeClick = { storeId, isLike -> /* 좋아요 기능 구현 */ }
             )
         }
     }
+
 }
 
 @Composable

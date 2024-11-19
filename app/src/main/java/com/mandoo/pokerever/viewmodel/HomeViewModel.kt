@@ -22,31 +22,21 @@ class HomeViewModel : ViewModel() {
     }
 
     fun fetchUserAddedStores(userId: String) {
-        viewModelScope.launch {
-            firestore.collection("users")
-                .document(userId)
-                .collection("addedStores")
-                .get()
-                .addOnSuccessListener { documents ->
-                    val storeIds = documents.map { it.id }
-                    if (storeIds.isNotEmpty()) {
-                        firestore.collection("stores")
-                            .whereIn("sid", storeIds)
-                            .get()
-                            .addOnSuccessListener { snapshot ->
-                                val stores = snapshot.toObjects(StoreInfo::class.java)
-                                userAddedStores.value = stores
-                            }
-                            .addOnFailureListener { e ->
-                                Log.e("HomeViewModel", "Failed to fetch stores: $e")
-                            }
-                    }
+        firestore.collection("users")
+            .document(userId)
+            .collection("addedStores")
+            .get()
+            .addOnSuccessListener { documents ->
+                val stores = documents.map { doc ->
+                    doc.toObject(StoreInfo::class.java).copy(sid = doc.id)
                 }
-                .addOnFailureListener { e ->
-                    Log.e("HomeViewModel", "Failed to fetch user added stores: $e")
-                }
-        }
+                userAddedStores.value = stores
+            }
+            .addOnFailureListener { e ->
+                Log.e("HomeViewModel", "Failed to fetch user added stores: $e")
+            }
     }
+
 
 
     // 사용자가 추가한 매장 목록 상태
