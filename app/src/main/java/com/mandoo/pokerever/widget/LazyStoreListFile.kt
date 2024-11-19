@@ -122,7 +122,7 @@ fun StoreListItemUI(storeInfo: StoreInfo, onItemClick: (StoreInfo) -> Unit) {
                     painter = painterResource(id = R.drawable.mainlogo),
                     contentDescription = storeInfo.address,
                     modifier = Modifier
-                        .size(80.dp)
+                        .size(50.dp)
                         .clip(CircleShape),
                     contentScale = ContentScale.Crop
                 )
