@@ -69,6 +69,8 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.coil.compose)
     implementation(libs.kotlinx.collections.immutable)
+    implementation (libs.play.services.location)
+
 
     // Firebase 관련 의존성
     implementation(libs.firebase.firestore)
