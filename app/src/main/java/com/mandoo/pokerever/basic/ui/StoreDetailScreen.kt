@@ -4,28 +4,11 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -37,20 +20,31 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.mandoo.pokerever.R
-import com.mandoo.pokerever.common.StoreInfo
 import com.mandoo.pokerever.utils.sendPoints
+import com.mandoo.pokerever.viewmodel.StoreDetailScreenViewModel
 
 @Composable
 fun StoreDetailScreen(
     navController: NavController,
-    storeInfo: StoreInfo,
-    userId: String
+    storeId: String,
+    userId: String,
+    viewModel: StoreDetailScreenViewModel = viewModel()
 ) {
     var isDialogVisible by remember { mutableStateOf(false) }
-    var pointInput by remember { mutableStateOf("") } // 다이얼로그 입력 포인트
-    val isInputValid = pointInput.toIntOrNull()?.let { it in 1..storeInfo.points } ?: false // 입력값 검증
+    var pointInput by remember { mutableStateOf("") }
+
+    val storeName by viewModel.storeName
+    val userPoints by viewModel.userPoints
+
+    // Firestore 데이터 로드
+    LaunchedEffect(storeId, userId) {
+        viewModel.loadStoreAndUserPoints(storeId, userId)
+    }
+
+    val isInputValid = pointInput.toIntOrNull()?.let { it in 1..userPoints } ?: false
 
     Column(
         modifier = Modifier
@@ -74,7 +68,7 @@ fun StoreDetailScreen(
                     .align(Alignment.CenterStart)
             )
             Text(
-                text = storeInfo.storeName, // 매장 이름
+                text = if (storeName.isNotEmpty()) storeName else "Loading...", // 매장 이름
                 color = Color.White,
                 fontWeight = FontWeight.Bold,
                 fontSize = 24.sp,
@@ -83,7 +77,7 @@ fun StoreDetailScreen(
         }
 
         // 구분선
-        HorizontalDivider(
+        Divider(
             color = Color.White,
             thickness = 2.dp,
             modifier = Modifier
@@ -97,7 +91,7 @@ fun StoreDetailScreen(
             fontSize = 16.sp
         )
 
-        // 포인트 정보 표시
+        // 사용자 포인트 표시
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -108,7 +102,7 @@ fun StoreDetailScreen(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(text = stringResource(R.string.user_point), style = pointInfoTextStyle)
                 Spacer(modifier = Modifier.width(4.dp))
-                Text(text = "${storeInfo.points}p", style = pointInfoTextStyle) // 보유 포인트 표시
+                Text(text = "$userPoints p", style = pointInfoTextStyle) // 사용자 포인트 표시
             }
             Image(
                 painter = painterResource(id = R.drawable.user_point_icon),
@@ -120,7 +114,7 @@ fun StoreDetailScreen(
         }
 
         // 구분선
-        HorizontalDivider(
+        Divider(
             color = Color.White,
             thickness = 0.4.dp,
             modifier = Modifier
@@ -134,7 +128,7 @@ fun StoreDetailScreen(
             fontSize = 12.sp
         )
 
-        // 포인트 송신 내역 헤더 (표시용)
+        // 포인트 송신 내역 헤더
         Row(
             verticalAlignment = Alignment.Bottom,
             horizontalArrangement = Arrangement.spacedBy(68.dp)
@@ -237,10 +231,16 @@ fun StoreDetailScreen(
                                     isDialogVisible = false
                                     sendPoints(
                                         userId = userId,
-                                        storeId = storeInfo.sid,
+                                        storeId = storeId,
                                         points = pointInput.toInt(),
-                                        onSuccess = { /* 성공 처리 */ },
-                                        onFailure = { /* 실패 처리 */ }
+                                        onSuccess = {
+                                            // 성공적으로 포인트를 전송한 후 처리
+                                            viewModel.loadStoreAndUserPoints(storeId, userId) // 업데이트된 데이터 다시 로드
+                                        },
+                                        onFailure = { errorMessage ->
+                                            // 실패 메시지 표시 (예: Toast)
+                                            println("포인트 전송 실패: $errorMessage")
+                                        }
                                     )
                                 }
                             )
