@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -37,6 +38,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import coil.compose.AsyncImage
@@ -60,14 +62,17 @@ fun LazyStoreList(searchQuery: String, viewModel: StoreViewModel) {
 
     LazyColumn {
         items(filteredStores) { store ->
-            StoreListItemUI(storeInfo = store, onItemClick = {
-                val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return@StoreListItemUI
-                viewModel.addStoreForUser(userId, store)
-                // 추가 후 상태 동기화
-                viewModel.loadStores() // 매장 목록 갱신
-                viewModel.loadUserAddedStores(userId) // 추가된 매장 갱신
-                // 매장 추가 및 관계 생성
-            })
+            StoreListItemUI(
+                storeInfo = store,
+                onItemClick = {
+                    val userId = viewModel.getUserId() ?: return@StoreListItemUI
+                    viewModel.addStoreForUser(userId, store) {
+                        // 추가 후 데이터 동기화
+                        viewModel.loadStores()
+                        viewModel.loadUserAddedStores(userId)
+                    }
+                }
+            )
         }
     }
 }
@@ -126,7 +131,7 @@ fun StoreListItemUI(storeInfo: StoreInfo, onItemClick: (StoreInfo) -> Unit) {
                     model = imageUrl,
                     contentDescription = storeInfo.address,
                     modifier = Modifier
-                        .size(80.dp)
+                        .size(50.dp)
                         .clip(CircleShape),
                     contentScale = ContentScale.Crop
                 )
@@ -162,18 +167,23 @@ fun StoreListItemUI(storeInfo: StoreInfo, onItemClick: (StoreInfo) -> Unit) {
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
+                    Row(
+                        modifier = Modifier.weight(1f),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         Text(
                             text = stringResource(id = R.string.store_address),
                             fontWeight = FontWeight.SemiBold,
                             style = typography.bodySmall,
-                            color = Color.White
+                            color = Color.White,
                         )
                         Spacer(modifier = Modifier.width(1.dp))
                         Text(
                             text = storeInfo.address,
                             style = typography.bodySmall,
-                            color = Color.White
+                            color = Color.White,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
 

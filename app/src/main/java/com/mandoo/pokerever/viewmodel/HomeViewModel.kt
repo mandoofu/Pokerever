@@ -16,32 +16,45 @@ class HomeViewModel : ViewModel() {
     private val auth = FirebaseAuth.getInstance()
     private val firestore = FirebaseFirestore.getInstance()
 
+    // 사용자 정보 상태
     var userInfoState: MutableState<UserInfoState> = mutableStateOf(UserInfoState())
+
+    // 사용자가 추가한 매장 목록 상태
+    val userAddedStores: MutableState<List<StoreInfo>> = mutableStateOf(emptyList())
+
     fun getUserId(): String? {
         return auth.currentUser?.uid
     }
 
+    // 사용자가 추가한 매장 정보를 Firestore에서 가져오는 함수
     fun fetchUserAddedStores(userId: String) {
-        firestore.collection("users")
-            .document(userId)
-            .collection("addedStores")
-            .get()
-            .addOnSuccessListener { documents ->
+        viewModelScope.launch {
+            try {
+                val documents = firestore.collection("users")
+                    .document(userId)
+                    .collection("addedStores")
+                    .get()
+                    .await()
+
+                // Firestore에서 데이터 매핑
                 val stores = documents.map { doc ->
-                    doc.toObject(StoreInfo::class.java).copy(sid = doc.id)
+                    StoreInfo(
+                        sid = doc.id,
+                        storeName = doc.getString("storeName") ?: "",
+                        address = doc.getString("address") ?: "",
+                        points = doc.getLong("points")?.toInt() ?: 0,
+                        imageRes = doc.getString("imageRes") ?: ""
+                    )
                 }
-                userAddedStores.value = stores
+
+                userAddedStores.value = stores // 상태 업데이트
+            } catch (e: Exception) {
+                Log.e("HomeViewModel", "Failed to fetch user added stores: ${e.localizedMessage}")
             }
-            .addOnFailureListener { e ->
-                Log.e("HomeViewModel", "Failed to fetch user added stores: $e")
-            }
+        }
     }
 
-
-
-    // 사용자가 추가한 매장 목록 상태
-    val userAddedStores = mutableStateOf<List<StoreInfo>>(emptyList())
-    // 로그인한 사용자 정보를 Firestore에서 가져오는 함수
+    // Firestore에서 사용자 정보 가져오기
     fun fetchUserInfo() {
         val userId = auth.currentUser?.uid
         if (userId != null) {
@@ -53,7 +66,7 @@ class HomeViewModel : ViewModel() {
                     val nickname = document.getString("nickname")
                     val frontNumber = document.getString("frontNumber")
 
-                    // 유저 정보 업데이트
+                    // 사용자 정보 업데이트
                     userInfoState.value = UserInfoState(
                         name = name,
                         nickname = nickname,
@@ -69,7 +82,7 @@ class HomeViewModel : ViewModel() {
         }
     }
 
-    // 비밀번호 변경 함수
+    // 비밀번호 변경
     fun updatePassword(newPassword: String, onSuccess: () -> Unit, onFailure: (String) -> Unit) {
         val user = auth.currentUser
         user?.updatePassword(newPassword)?.addOnCompleteListener { task ->
@@ -81,19 +94,13 @@ class HomeViewModel : ViewModel() {
         }
     }
 
-    // 로그아웃 함수
+    // 로그아웃 처리
     fun logout(onSuccess: () -> Unit) {
-        // 비동기 작업을 처리할 때
         try {
-            // 로그아웃 작업 예: Firebase 세션 종료
             FirebaseAuth.getInstance().signOut()
-            // 로그아웃 성공 후 콜백 호출
             onSuccess()
         } catch (e: Exception) {
-            // 오류 처리
             Log.e("LogoutError", "로그아웃 오류: ${e.message}")
-            // 오류 발생 시 UI에 메시지 표시 등 처리
         }
     }
 }
-

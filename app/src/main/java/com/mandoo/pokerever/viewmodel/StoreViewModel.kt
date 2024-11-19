@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.mandoo.pokerever.common.StoreInfo
-import com.mandoo.pokerever.common.getStoresFromFirestore
 import kotlinx.coroutines.launch
 
 class StoreViewModel : ViewModel() {
@@ -21,12 +20,15 @@ class StoreViewModel : ViewModel() {
         return auth.currentUser?.uid
     }
 
-
     // 모든 매장 로드
     fun loadStores() {
         viewModelScope.launch {
-            getStoresFromFirestore { stores ->
-                storeList.value = stores
+            db.collection("stores").get().addOnSuccessListener { result ->
+                storeList.value = result.map { doc ->
+                    doc.toObject(StoreInfo::class.java).copy(sid = doc.id)
+                }
+            }.addOnFailureListener { e ->
+                Log.e("StoreViewModel", "Failed to load stores: ${e.localizedMessage}")
             }
         }
     }
@@ -39,32 +41,39 @@ class StoreViewModel : ViewModel() {
                 val addedStoreIds = result.documents.map { it.id }
                 userAddedStores.value = addedStoreIds
             }
+            .addOnFailureListener { e ->
+                Log.e("StoreViewModel", "Failed to fetch added stores: ${e.localizedMessage}")
+            }
     }
 
     // 유저가 매장을 추가
-    fun addStoreForUser(userId: String, storeInfo: StoreInfo) {
+    fun addStoreForUser(userId: String, storeInfo: StoreInfo, onSuccess: () -> Unit) {
         val userStoreRef = db.collection("users").document(userId).collection("addedStores")
             .document(storeInfo.sid)
-        val storeUserRef =
-            db.collection("stores").document(storeInfo.sid).collection("users").document(userId)
+        val storeUserRef = db.collection("stores").document(storeInfo.sid).collection("users")
+            .document(userId)
 
         db.runBatch { batch ->
-            batch.set(userStoreRef, mapOf("points" to 0))
-            batch.set(storeUserRef, mapOf("points" to 0))
-        }.addOnSuccessListener {
-            loadUserAddedStores(userId)
-        }.addOnFailureListener { e ->
-            Log.e("StoreViewModel", "Failed to add store for user: ${e.localizedMessage}")
-        }
+            batch.set(userStoreRef, mapOf(
+                "storeName" to storeInfo.storeName,
+                "address" to storeInfo.address,
+                "points" to 0,
+                "imageRes" to storeInfo.imageRes
+            ))
+            batch.set(storeUserRef, mapOf(
+                "userName" to "사용자 이름", // 적절한 값으로 변경 필요
+                "points" to 0
+            ))
+        }.addOnSuccessListener { onSuccess() }
+            .addOnFailureListener { e ->
+                Log.e("StoreViewModel", "Failed to add store: ${e.localizedMessage}")
+            }
     }
 
-
-
-    // 모든 데이터를 초기화
+    // 데이터 초기화
     fun initializeData() {
-        val userId = auth.currentUser?.uid ?: return
+        val userId = getUserId() ?: return
         loadStores()
         loadUserAddedStores(userId)
     }
 }
-
