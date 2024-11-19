@@ -25,6 +25,7 @@ import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,11 +37,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
+import com.google.firebase.storage.FirebaseStorage
 import com.mandoo.pokerever.R
 import com.mandoo.pokerever.common.StoreInfo
+import kotlinx.coroutines.tasks.await
 
 @Composable
 fun LazyCreateStoreList(navController: NavController, stores: List<StoreInfo>) {
@@ -51,11 +56,10 @@ fun LazyCreateStoreList(navController: NavController, stores: List<StoreInfo>) {
                 onStoreClick = { storeId ->
                     navController.navigate("store_detail_screen/$storeId")
                 },
-                onLikeClick = { storeId, isLike -> /* 좋아요 기능 구현 */ }
+                onLikeClick = { storeId, isLike -> /* 좋아요 처리 */ }
             )
         }
     }
-
 }
 
 @Composable
@@ -66,6 +70,21 @@ fun CreateStoreListItemUI(
 ) {
     // 좋아요 상태를 로컬에서 관리
     var isLiked by remember { mutableStateOf(false) }
+    var imageUrl by remember { mutableStateOf<String?>(null) }
+    var isLoading by remember { mutableStateOf(true) }
+
+    // Firebase Storage에서 이미지 URL 가져오기
+    LaunchedEffect(storeInfo.imageRes) {
+        val storageReference = FirebaseStorage.getInstance().reference.child(storeInfo.imageRes)
+        try {
+            val uri = storageReference.downloadUrl.await() // 코루틴으로 안전하게 처리
+            imageUrl = uri.toString()
+        } catch (e: Exception) {
+            imageUrl = null // 실패 시 null 처리
+        } finally {
+            isLoading = false
+        }
+    }
 
     Card(
         modifier = Modifier
@@ -85,15 +104,26 @@ fun CreateStoreListItemUI(
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-            // 매장 이미지
-            Image(
-                painter = rememberAsyncImagePainter(storeInfo.imageRes),
-                contentDescription = storeInfo.address,
-                modifier = Modifier
-                    .size(50.dp)
-                    .clip(CircleShape),
-                contentScale = ContentScale.Crop
-            )
+            // 이미지 로딩 상태에 따른 UI 변경
+            if (isLoading || imageUrl == null) {
+                Image(
+                    painter = rememberAsyncImagePainter(R.drawable.mainlogo), // 기본 이미지
+                    contentDescription = storeInfo.address,
+                    modifier = Modifier
+                        .size(50.dp)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.Crop
+                )
+            } else {
+                AsyncImage(
+                    model = imageUrl,
+                    contentDescription = storeInfo.address,
+                    modifier = Modifier
+                        .size(50.dp)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.Crop
+                )
+            }
 
             Spacer(modifier = Modifier.width(16.dp))
 
@@ -133,7 +163,9 @@ fun CreateStoreListItemUI(
                     Text(
                         text = storeInfo.address,
                         style = typography.bodySmall,
-                        color = Color.White
+                        color = Color.White,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
 
@@ -173,4 +205,3 @@ fun CreateStoreListItemUI(
         }
     }
 }
-

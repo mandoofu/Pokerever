@@ -137,7 +137,7 @@ fun StoreDetailScreen(
         // 포인트 송신 내역 헤더 (표시용)
         Row(
             verticalAlignment = Alignment.Bottom,
-            horizontalArrangement = Arrangement.spacedBy(72.dp)
+            horizontalArrangement = Arrangement.spacedBy(68.dp)
         ) {
             Text(text = stringResource(R.string.from_user), style = receivingPointInfoTextStyle)
             Text(text = stringResource(R.string.recipient_user), style = receivingPointInfoTextStyle)
