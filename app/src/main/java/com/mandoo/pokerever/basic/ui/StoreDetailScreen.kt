@@ -25,6 +25,7 @@ import androidx.navigation.NavController
 import com.mandoo.pokerever.R
 import com.mandoo.pokerever.utils.sendPoints
 import com.mandoo.pokerever.viewmodel.StoreDetailScreenViewModel
+import com.mandoo.pokerever.widget.TransactionList
 
 @Composable
 fun StoreDetailScreen(
@@ -38,10 +39,12 @@ fun StoreDetailScreen(
 
     val storeName by viewModel.storeName
     val userPoints by viewModel.userPoints
+    val transactions by viewModel.transactionHistory
 
     // Firestore 데이터 로드
     LaunchedEffect(storeId, userId) {
         viewModel.loadStoreAndUserPoints(storeId, userId)
+        viewModel.loadTransactionHistory(userId, storeId)
     }
 
     val isInputValid = pointInput.toIntOrNull()?.let { it in 1..userPoints } ?: false
@@ -138,6 +141,8 @@ fun StoreDetailScreen(
             Text(text = stringResource(R.string.time), style = receivingPointInfoTextStyle)
             Text(text = stringResource(R.string.quantity), style = receivingPointInfoTextStyle)
         }
+        TransactionList(transactions = transactions)
+
 
         // 포인트 전송 다이얼로그
         if (isDialogVisible) {
@@ -230,9 +235,11 @@ fun StoreDetailScreen(
                                 modifier = Modifier.clickable(enabled = isInputValid) {
                                     isDialogVisible = false
                                     sendPoints(
-                                        userId = userId,
-                                        storeId = storeId,
-                                        points = pointInput.toInt(),
+                                        fromId = userId,          // 보낸 사람 ID
+                                        fromType = "user",        // 보낸 사람 유형 ("user" 또는 "store")
+                                        toId = storeId,           // 받는 사람 ID
+                                        toType = "store",         // 받는 사람 유형 ("user" 또는 "store")
+                                        points = pointInput.toInt(), // 전송할 포인트
                                         onSuccess = {
                                             // 성공적으로 포인트를 전송한 후 처리
                                             viewModel.loadStoreAndUserPoints(storeId, userId) // 업데이트된 데이터 다시 로드
