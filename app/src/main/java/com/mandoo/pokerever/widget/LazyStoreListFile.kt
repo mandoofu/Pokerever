@@ -55,14 +55,18 @@ fun LazyStoreList(searchQuery: String, viewModel: StoreViewModel) {
 
     // 유저가 추가하지 않은 매장 필터링
     val filteredStores = stores.filter { store ->
-        store.sid !in userAddedStores
+        userAddedStores.none { it == store.sid }
     }
 
     LazyColumn {
         items(filteredStores) { store ->
             StoreListItemUI(storeInfo = store, onItemClick = {
                 val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return@StoreListItemUI
-                viewModel.addStoreForUser(userId, store) // 매장 추가
+                viewModel.addStoreForUser(userId, store)
+                // 추가 후 상태 동기화
+                viewModel.loadStores() // 매장 목록 갱신
+                viewModel.loadUserAddedStores(userId) // 추가된 매장 갱신
+                // 매장 추가 및 관계 생성
             })
         }
     }

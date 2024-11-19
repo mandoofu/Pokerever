@@ -43,34 +43,43 @@ fun addStoreToUser(userId: String, storeId: String, onSuccess: () -> Unit, onFai
         }
 }
 
-fun fetchUserAddedStores(userId: String, onResult: (List<Pair<String, Int>>) -> Unit, onFailure: (String) -> Unit) {
+fun fetchUserAddedStores(
+    userId: String,
+    onResult: (List<StoreInfo>) -> Unit,
+    onFailure: (String) -> Unit
+) {
     val db = FirebaseFirestore.getInstance()
-    val userRef = db.collection("users").document(userId)
-
-    userRef.collection("addedStores")
+    db.collection("users").document(userId).collection("addedStores")
         .get()
         .addOnSuccessListener { result ->
-            val addedStores = result.documents.map { document ->
-                val storeId = document.id
-                val points = document.getLong("points")?.toInt() ?: 0
-                storeId to points
+            val addedStores = result.map { doc ->
+                doc.toObject(StoreInfo::class.java).copy(sid = doc.id)
             }
             onResult(addedStores)
         }
         .addOnFailureListener { e ->
-            onFailure(e.localizedMessage ?: "Failed to fetch user added stores")
+            onFailure(
+                e.localizedMessage ?: "Failed to fetch user added stores"
+            )
         }
 }
 
 fun updateUserPoints(userId: String, storeId: String, delta: Int, onSuccess: () -> Unit, onFailure: (String) -> Unit) {
     val db = FirebaseFirestore.getInstance()
+
     val userStoreRef = db.collection("users").document(userId).collection("addedStores").document(storeId)
+    val storeUserRef =
+        db.collection("stores").document(storeId).collection("users").document(userId)
 
     db.runTransaction { transaction ->
-        val snapshot = transaction.get(userStoreRef)
-        val currentPoints = snapshot.getLong("points")?.toInt() ?: 0
-        val updatedPoints = currentPoints + delta
-        transaction.update(userStoreRef, "points", updatedPoints)
+        val userSnapshot = transaction.get(userStoreRef)
+        val storeSnapshot = transaction.get(storeUserRef)
+
+        val userPoints = userSnapshot.getLong("points")?.toInt() ?: 0
+        val storePoints = storeSnapshot.getLong("points")?.toInt() ?: 0
+
+        transaction.update(userStoreRef, "points", userPoints + delta)
+        transaction.update(storeUserRef, "points", storePoints + delta)
     }.addOnSuccessListener { onSuccess() }
         .addOnFailureListener { e -> onFailure(e.localizedMessage ?: "Failed to update points") }
 }

@@ -35,7 +35,7 @@ fun HomeScreen(navController: NavController) {
     LaunchedEffect(Unit) {
         val userId = viewModel.getUserId() ?: return@LaunchedEffect
         viewModel.fetchUserInfo()
-        viewModel.fetchUserAddedStores(userId)
+        viewModel.fetchUserAddedStores(userId) // Firestore에서 추가된 매장 불러오기
     }
 
     // 로딩 중 UI 표시
