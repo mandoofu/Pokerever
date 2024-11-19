@@ -22,14 +22,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.mandoo.pokerever.R
+import com.mandoo.pokerever.location.LocationProvider
 import com.mandoo.pokerever.viewmodel.StoreViewModel
 import com.mandoo.pokerever.widget.LazyStoreList
 
@@ -39,11 +42,26 @@ fun StoreScreen(navController: NavController) {
 
     // 현재 사용자 ID 가져오기
     val userId = storeViewModel.getUserId() ?: ""
+    var userLat by remember { mutableStateOf<Double?>(null) }
+    var userLon by remember { mutableStateOf<Double?>(null) }
 
     // Firestore에서 매장 정보를 로드
     LaunchedEffect(Unit) {
         storeViewModel.loadStores()
     }
+    // 현재 위치 가져오기
+    val locationProvider = LocationProvider(LocalContext.current)
+    locationProvider.getCurrentLocation { location ->
+        if (location != null) {
+            userLat = location.latitude
+            userLon = location.longitude
+        } else {
+            // 위치를 가져오지 못했을 때 처리
+            userLat = null
+            userLon = null
+        }
+    }
+
 
     Column(
         modifier = Modifier
@@ -85,9 +103,21 @@ fun StoreScreen(navController: NavController) {
         )
 
         // 검색어 및 필터링된 매장을 LazyStoreList로 표시
-        LazyStoreList(
-            searchQuery = storename,
-            viewModel = storeViewModel
-        )
+        if (userLat != null && userLon != null) {
+            LazyStoreList(
+                searchQuery = storename,
+                viewModel = storeViewModel,
+                userLat = userLat!!,
+                userLon = userLon!!
+            )
+        } else {
+            // 위치를 가져오는 동안 대체 UI 표시
+            Text(
+                text = stringResource(R.string.loading_location),
+                color = Color.White,
+                style = TextStyle(fontSize = 16.sp),
+                modifier = Modifier.padding(top = 16.dp)
+            )
+        }
     }
 }

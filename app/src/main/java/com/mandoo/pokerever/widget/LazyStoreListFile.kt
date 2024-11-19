@@ -51,22 +51,31 @@ import com.mandoo.pokerever.map.openNaverMap
 import com.mandoo.pokerever.viewmodel.StoreViewModel
 
 @Composable
-fun LazyStoreList(searchQuery: String, viewModel: StoreViewModel) {
-    val stores by remember { viewModel.storeList }
-    val userAddedStores by remember { viewModel.userAddedStores }
+fun LazyStoreList(searchQuery: String, viewModel: StoreViewModel, userLat: Double, userLon: Double) {
+    val stores = viewModel.storeList
+    val userAddedStores = viewModel.userAddedStores
 
     // 유저가 추가하지 않은 매장 필터링
     val filteredStores = stores.filter { store ->
-        userAddedStores.none { it == store.sid }
+        userAddedStores.none { it == store.sid } &&
+                store.storeName.contains(searchQuery, ignoreCase = true)
     }
-
     LazyColumn {
         items(filteredStores) { store ->
+            // 거리 계산 수행
+            val distance = store.geoPoint?.let {
+                viewModel.calculateDistance(userLat, userLon, it.latitude, it.longitude)
+            } ?: Double.MAX_VALUE // 거리 계산 실패 시 큰 값
+
+            // 거리 값을 포함한 StoreInfo 객체 생성
+            val updatedStoreInfo = store.copy(distance = distance)
+
+            // 매장 정보 UI 표시
             StoreListItemUI(
-                storeInfo = store,
+                storeInfo = updatedStoreInfo,
                 onItemClick = {
                     val userId = viewModel.getUserId() ?: return@StoreListItemUI
-                    viewModel.addStoreForUser(userId, store) {
+                    viewModel.addStoreForUser(userId, updatedStoreInfo) {
                         // 추가 후 데이터 동기화
                         viewModel.loadStores()
                         viewModel.loadUserAddedStores(userId)
@@ -212,7 +221,7 @@ fun StoreListItemUI(storeInfo: StoreInfo, onItemClick: (StoreInfo) -> Unit) {
                     )
                     Spacer(modifier = Modifier.width(1.dp))
                     Text(
-                        text = "${storeInfo.distance}M",
+                        text = "${storeInfo.distance.toInt()} M", // 미터 단위로 표시
                         style = typography.bodySmall,
                         color = Color.White
                     )
@@ -245,7 +254,7 @@ fun StoreListItemUI(storeInfo: StoreInfo, onItemClick: (StoreInfo) -> Unit) {
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Column {
                                         Text(
-                                            text = storeInfo.address,
+                                            text = storeInfo.storeName,
                                             fontWeight = FontWeight.Bold,
                                             color = Color.Black
                                         )
