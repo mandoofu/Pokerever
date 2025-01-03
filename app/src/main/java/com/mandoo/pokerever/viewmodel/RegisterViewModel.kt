@@ -1,5 +1,6 @@
 package com.mandoo.pokerever.viewmodel
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -48,9 +49,12 @@ class RegisterViewModel : ViewModel() {
                     .document(userCredential.user?.uid ?: "")
                     .set(user)
                     .addOnSuccessListener {
+                        Log.d("Firestore", "User data successfully written to Firestore")
+
                         // 회원가입 성공 처리
                     }
                     .addOnFailureListener { e ->
+                        Log.e("Firestore", "Error writing user data to Firestore: ${e.localizedMessage}")
                         // 에러 처리
                     }
             } catch (e: Exception) {

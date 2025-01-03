@@ -15,7 +15,12 @@ fun openNaverMap(context: Context, address: String) {
     val webUri = Uri.parse("https://map.naver.com/v5/search/$encodedAddress")
 
     // 네이버 지도 앱 설치 여부 확인
-    val intent = Intent(Intent.ACTION_VIEW, appUri)
+    val intent = with(Intent()) {
+        action = Intent.ACTION_VIEW
+        data = appUri
+        this
+    }
+
     val packageManager = context.packageManager
     val isAppInstalled =
         packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY).isNotEmpty()
@@ -25,6 +30,11 @@ fun openNaverMap(context: Context, address: String) {
         context.startActivity(intent)
     } else {
         // 네이버 지도 웹 브라우저로 열기
-        context.startActivity(Intent(Intent.ACTION_VIEW, webUri))
+        val webIntent = with(Intent()) {
+            action = Intent.ACTION_VIEW
+            data = webUri
+            this
+        }
+        context.startActivity(webIntent)
     }
 }
