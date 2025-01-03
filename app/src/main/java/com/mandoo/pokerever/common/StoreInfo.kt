@@ -2,7 +2,9 @@ package com.mandoo.pokerever.common
 
 
 import com.google.firebase.firestore.GeoPoint
+import javax.annotation.concurrent.Immutable
 
+@Immutable
 data class StoreInfo(
     val sid: String = "",
     val storeName: String = "",
