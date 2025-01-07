@@ -4,6 +4,7 @@ firebaseBom = "33.5.1"
 firebaseDatabaseKtxVersion = "20.3.0"
 firebaseMessagingKtxVersion = "23.3.1"
 googleHiltAndroid = "2.45"
+googleServices = "4.4.2"
 gradle = "7.4.2"
 hiltAndroid = "2.45"
 hiltAndroidGradlePlugin = "2.44"
@@ -38,6 +39,7 @@ androidx-hilt-navigation-compose-v100 = { module = "androidx.hilt:hilt-navigatio
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 firebase-database-ktx-v2030 = { module = "com.google.firebase:firebase-database-ktx", version.ref = "firebaseDatabaseKtxVersion" }
 firebase-messaging-ktx-v2331 = { module = "com.google.firebase:firebase-messaging-ktx", version.ref = "firebaseMessagingKtxVersion" }
+google-services = { module = "com.google.gms:google-services", version.ref = "googleServices" }
 gradle = { module = "com.android.tools.build:gradle", version.ref = "gradle" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroid" }
 hilt-android-gradle-plugin-v244 = { module = "com.google.dagger:hilt-android-gradle-plugin", version.ref = "hiltAndroidGradlePlugin" }
