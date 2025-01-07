@@ -2,8 +2,8 @@
 plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.kotlin.android) apply false
-    id("com.google.gms.google-services") version "4.4.2" apply false
 }
+
 buildscript {
     repositories {
         google()
@@ -13,5 +13,6 @@ buildscript {
         classpath(libs.gradle) // Android Gradle Plugin
         classpath(libs.kotlin.gradle.plugin) // Kotlin Plugin
         classpath(libs.hilt.android.gradle.plugin.v244)
+        classpath(libs.google.services) // Google Services Plugin
     }
 }
