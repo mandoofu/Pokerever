@@ -3,16 +3,18 @@ plugins {
     alias(libs.plugins.kotlin.android)
     id("kotlin-kapt") // kapt 플러그인 추가
     id("dagger.hilt.android.plugin") // Hilt 플러그인 추가
+    //id("com.google.gms.google-services") // Google Services 플러그인 추가
+    alias(libs.plugins.google.services)
 }
 
 android {
     namespace = "com.mandoo.pokerever"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.mandoo.pokerever"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -33,12 +35,12 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
 
     buildFeatures {
@@ -78,7 +80,7 @@ dependencies {
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.messaging.ktx.v2331)
     implementation(libs.firebase.database.ktx.v2030)
-    implementation(libs.firebase.bom)
+    implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.firestore.ktx)
 
     // Hilt 관련 의존성
