@@ -1,10 +1,10 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    id("kotlin-kapt") // kapt 플러그인 추가
-    id("dagger.hilt.android.plugin") // Hilt 플러그인 추가
-    //id("com.google.gms.google-services") // Google Services 플러그인 추가
     alias(libs.plugins.google.services)
+    alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.com.google.devetool.ksp)
+    alias(libs.plugins.hilt.android)
 }
 
 android {
@@ -13,7 +13,7 @@ android {
 
     defaultConfig {
         applicationId = "com.mandoo.pokerever"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
@@ -46,18 +46,7 @@ android {
     buildFeatures {
         compose = true
     }
-
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.14"
-    }
-
-    packaging {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
-    }
 }
-
 dependencies {
     // 기본 의존성
     implementation(libs.androidx.core.ktx)
@@ -83,17 +72,14 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.firestore.ktx)
 
-    // Hilt 관련 의존성
-    implementation(libs.hilt.android.v245)
-    kapt(libs.hilt.android.compiler)
-
     // Firebase Auth 및 Storage
     implementation(libs.firebase.auth.ktx)
     implementation(libs.firebase.storage.ktx)
 
     // ViewModel 및 Compose용 Hilt
-    implementation(libs.androidx.hilt.navigation.compose.v100)
-    kapt(libs.androidx.hilt.compiler.v100)
+    implementation(libs.hilt.android)
+    implementation(libs.androidx.hilt.navigation.compose)
+    ksp(libs.hilt.compiler)
 
     // 테스트 의존성
     testImplementation(libs.junit)

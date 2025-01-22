@@ -1,17 +1,11 @@
 [versions]
-agp = "8.6.1"
-firebaseBom = "33.7.0"
+agp = "8.8.0"
+firebaseBom = "33.8.0"
 firebaseDatabaseKtxVersion = "21.0.0"
 firebaseMessagingKtxVersion = "24.1.0"
-googleHiltAndroid = "2.45"
 googleServices = "4.4.2"
 gradle = "7.4.2"
-hiltAndroid = "2.45"
-hiltAndroidGradlePlugin = "2.45"
-hiltCompiler = "1.2.0"
-hiltLifecycleViewmodel = "1.0.0-alpha03"
-hiltNavigationComposeVersion = "1.2.0"
-kotlin = "1.9.24"
+kotlin = "2.1.0"
 coreKtx = "1.15.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
@@ -24,26 +18,27 @@ composeBom = "2025.01.00"
 materialIconsExtended = "1.7.6"
 navigationRuntimeKtx = "2.8.5"
 navigationCompose = "2.8.5"
-coilCompose = "2.6.0"
+coilCompose = "2.7.0"
 firebaseFirestore = "25.1.1"
 firebaseFirestoreKtx = "25.1.1"
 firebaseAuthKtx = "23.1.0"
 firebaseStorageKtx = "21.0.1"
 playServicesLocation = "21.3.0"
 
+#ksp
+comGoogleDevtoolsKspGradlePlugin = "2.1.0-1.0.29"
+
+#hilt
+hilt = "2.55"
+hiltNavigationCompose = "1.2.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
-androidx-hilt-compiler-v100 = { module = "androidx.hilt:hilt-compiler", version.ref = "hiltCompiler" }
-androidx-hilt-navigation-compose-v100 = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationComposeVersion" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 firebase-database-ktx-v2030 = { module = "com.google.firebase:firebase-database-ktx", version.ref = "firebaseDatabaseKtxVersion" }
 firebase-messaging-ktx-v2331 = { module = "com.google.firebase:firebase-messaging-ktx", version.ref = "firebaseMessagingKtxVersion" }
 google-services = { module = "com.google.gms:google-services", version.ref = "googleServices" }
 gradle = { module = "com.android.tools.build:gradle", version.ref = "gradle" }
-hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroid" }
-hilt-android-gradle-plugin-v244 = { module = "com.google.dagger:hilt-android-gradle-plugin", version.ref = "hiltAndroidGradlePlugin" }
-hilt-android-v245 = { module = "com.google.dagger:hilt-android", version.ref = "googleHiltAndroid" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
@@ -69,9 +64,16 @@ firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx",
 firebase-storage-ktx = { group = "com.google.firebase", name = "firebase-storage-ktx", version.ref = "firebaseStorageKtx" }
 play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "playServicesLocation" }
 
+#hilt
+hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
+hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hilt" }
+androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
+
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 google-services = { id = "com.google.gms.google-services" }
-
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+com-google-devetool-ksp = { id = "com.google.devtools.ksp", version.ref = "comGoogleDevtoolsKspGradlePlugin"}
+hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 

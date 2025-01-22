@@ -31,7 +31,6 @@ fun TransactionList(transactions: List<Transaction>) {
         }
     }
 }
-
 fun fetchNameFromFirestore(id: String, type: String, onResult: (String) -> Unit) {
     val db = FirebaseFirestore.getInstance()
     val collection = if (type == "user") "users" else "stores"
