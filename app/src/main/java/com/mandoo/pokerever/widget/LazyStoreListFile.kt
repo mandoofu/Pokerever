@@ -48,7 +48,6 @@ import com.google.firebase.storage.StorageReference
 import com.mandoo.pokerever.R
 import com.mandoo.pokerever.common.StoreInfo
 import com.mandoo.pokerever.map.openNaverMap
-import com.mandoo.pokerever.util.FirebaseStorageCache
 import com.mandoo.pokerever.viewmodel.StoreViewModel
 
 @Composable
@@ -97,19 +96,15 @@ fun StoreListItemUI(storeInfo: StoreInfo, onItemClick: (StoreInfo) -> Unit) {
     var imageUrl by remember { mutableStateOf<String?>(null) }
     var isLoading by remember { mutableStateOf(true) }
 
-    // Firebase Storage URL 캐싱
+    // 비동기적으로 Firebase에서 이미지 URL을 가져오기
     LaunchedEffect(storeInfo.imageRes) {
-        FirebaseStorageCache.getCachedUrl(
-            reference = storageReference,
-            onSuccess = {
-                imageUrl = it
-                isLoading = false
-            },
-            onFailure = {
-                imageUrl = null
-                isLoading = false
-            }
-        )
+        storageReference.downloadUrl.addOnSuccessListener { uri ->
+            imageUrl = uri.toString()
+            isLoading = false // 이미지 로딩 완료
+        }.addOnFailureListener {
+            imageUrl = null
+            isLoading = false // 이미지 로딩 실패
+        }
     }
 
     Card(
