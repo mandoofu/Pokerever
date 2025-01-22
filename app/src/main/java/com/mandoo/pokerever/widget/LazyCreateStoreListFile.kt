@@ -45,6 +45,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.google.firebase.storage.FirebaseStorage
 import com.mandoo.pokerever.R
 import com.mandoo.pokerever.common.StoreInfo
+import com.mandoo.pokerever.util.FirebaseStorageCache
 import kotlinx.coroutines.tasks.await
 
 @Composable
@@ -76,14 +77,17 @@ fun CreateStoreListItemUI(
     // Firebase Storage에서 이미지 URL 가져오기
     LaunchedEffect(storeInfo.imageRes) {
         val storageReference = FirebaseStorage.getInstance().reference.child(storeInfo.imageRes)
-        try {
-            val uri = storageReference.downloadUrl.await() // 코루틴으로 안전하게 처리
-            imageUrl = uri.toString()
-        } catch (e: Exception) {
-            imageUrl = null // 실패 시 null 처리
-        } finally {
-            isLoading = false
-        }
+        FirebaseStorageCache.getCachedUrl(
+            reference = storageReference,
+            onSuccess = { url ->
+                imageUrl = url
+                isLoading = false
+            },
+            onFailure = {
+                imageUrl = null
+                isLoading = false
+            }
+        )
     }
 
     Card(

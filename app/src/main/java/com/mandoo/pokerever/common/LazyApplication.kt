@@ -21,17 +21,17 @@ class LazyApplication : Application(), ImageLoaderFactory {
         return ImageLoader.Builder(this)
             .memoryCache {
                 MemoryCache.Builder(this)
-                    .maxSizePercent(0.30)
+                    .maxSizePercent(0.25) // 메모리 캐시 최대 크기
                     .build()
             }
             .diskCache {
                 DiskCache.Builder()
                     .directory(cacheDir.resolve("coil_image_cache"))
-                    .maxSizePercent(0.1)
+                    .maxSizePercent(0.05) // 디스크 캐시 최대 크기
                     .build()
             }
-            //.logger(DebugLogger())
-            .respectCacheHeaders(false)
+            .respectCacheHeaders(false) // 캐시 헤더 무시
+            .crossfade(true) // 부드러운 이미지 전환
             .build()
     }
 }
