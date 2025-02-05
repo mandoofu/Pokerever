@@ -35,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -42,9 +43,11 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
+import coil.imageLoader
 import com.google.firebase.storage.FirebaseStorage
 import com.mandoo.pokerever.R
 import com.mandoo.pokerever.common.StoreInfo
+import com.mandoo.pokerever.utils.FirebaseStorageCache
 import kotlinx.coroutines.tasks.await
 
 @Composable
@@ -73,17 +76,20 @@ fun CreateStoreListItemUI(
     var imageUrl by remember { mutableStateOf<String?>(null) }
     var isLoading by remember { mutableStateOf(true) }
 
-    // Firebase Storage에서 이미지 URL 가져오기
+    val storageReference = FirebaseStorage.getInstance().reference.child(storeInfo.imageRes)
+
     LaunchedEffect(storeInfo.imageRes) {
-        val storageReference = FirebaseStorage.getInstance().reference.child(storeInfo.imageRes)
-        try {
-            val uri = storageReference.downloadUrl.await() // 코루틴으로 안전하게 처리
-            imageUrl = uri.toString()
-        } catch (e: Exception) {
-            imageUrl = null // 실패 시 null 처리
-        } finally {
-            isLoading = false
-        }
+        FirebaseStorageCache.getCachedUrl(
+            reference = storageReference,
+            onSuccess = {
+                imageUrl = it
+                isLoading = false
+            },
+            onFailure = {
+                imageUrl = null
+                isLoading = false
+            }
+        )
     }
 
     Card(
@@ -105,22 +111,19 @@ fun CreateStoreListItemUI(
                 .padding(16.dp)
         ) {
             // 이미지 로딩 상태에 따른 UI 변경
-            if (isLoading || imageUrl == null) {
+            if (isLoading) {
                 Image(
-                    painter = rememberAsyncImagePainter(R.drawable.mainlogo), // 기본 이미지
+                    painter = rememberAsyncImagePainter(R.drawable.mainlogo),
                     contentDescription = storeInfo.address,
-                    modifier = Modifier
-                        .size(50.dp)
-                        .clip(CircleShape),
+                    modifier = Modifier.size(50.dp).clip(CircleShape),
                     contentScale = ContentScale.Crop
                 )
             } else {
                 AsyncImage(
                     model = imageUrl,
                     contentDescription = storeInfo.address,
-                    modifier = Modifier
-                        .size(50.dp)
-                        .clip(CircleShape),
+                    imageLoader = LocalContext.current.imageLoader,
+                    modifier = Modifier.size(50.dp).clip(CircleShape),
                     contentScale = ContentScale.Crop
                 )
             }
