@@ -1,90 +1,67 @@
 package com.mandoo.pokerever.tab
 
-import android.util.Log
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
-import com.mandoo.pokerever.basic.ui.HomeScreen
-import com.mandoo.pokerever.basic.ui.LoginScreen
-import com.mandoo.pokerever.common.sliceNavGraph
+import com.mandoo.pokerever.R
 
-@Preview(showBackground = true)
 @Composable
-fun BottomNavigationBarScaffold() {
-    val navController = rememberNavController()
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route
+fun BottomNavigationBarScaffold(navController: NavController) {
+    val items = listOf(
+        BottomNavigationItem("매장", R.drawable.store_icon, "store"),
+        BottomNavigationItem("홈", R.drawable.user_point_icon, "home"),
+        BottomNavigationItem("내 정보", R.drawable.user_info_icon, "info")
+    )
 
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        bottomBar = {
-            // store_detail_screen이 아닐 때만 BottomNavigationBar 표시
-            if (currentRoute != "store_detail_screen/{storeId}") {
-                Log.d("bottomtab", currentRoute.toString())
-                NavigationBar(
-                    modifier = Modifier.height(56.dp),
-                    containerColor = Color.Gray
-                ) {
-                    BottomNavigationItem().renderBottomNavigationItems()
-                        .forEachIndexed { _, navigationItem ->
-                            NavigationBarItem(
-                                selected = navigationItem.route == currentRoute,
-                                label = {
-                                    Text(
-                                        text = navigationItem.tabName,
-                                        color = Color.White
-                                    )
-                                },
-                                icon = {
-                                    navigationItem.icon?.let {
-                                        Icon(
-                                            painter = it,
-                                            contentDescription = navigationItem.tabName,
-                                            modifier = Modifier.size(28.dp),
-                                            tint = Color.White
-                                        )
-                                    }
-                                },
-                                onClick = {
-                                    navController.navigate(navigationItem.route) {
-                                        popUpTo(navController.graph.findStartDestination().id) {
-                                            saveState = true
-                                        }
-                                        launchSingleTop = true
-                                        restoreState = true
-                                    }
-                                }
-                            )
+    val currentBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = currentBackStackEntry?.destination?.route
+
+    // 현재 선택된 탭을 remember 상태로 관리
+    var selectedRoute by remember { mutableStateOf(currentRoute) }
+
+    // NavController 변경 사항 감지 후 상태 업데이트
+    LaunchedEffect(currentRoute) {
+        selectedRoute = currentRoute
+    }
+
+    NavigationBar(
+        modifier = Modifier.height(56.dp),
+        containerColor = Color.Gray
+    ) {
+        items.forEach { item ->
+            NavigationBarItem(
+                selected = item.route == selectedRoute,
+                label = { Text(text = item.tabName, color = Color.White) },
+                icon = {
+                    Icon(
+                        painterResource(id = item.icon),
+                        contentDescription = item.tabName,
+                        modifier = Modifier.size(28.dp),
+                        tint = if (item.route == selectedRoute) Color.Yellow else Color.White
+                    )
+                },
+                onClick = {
+                    if (selectedRoute != item.route) {
+                        navController.navigate(item.route) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
                         }
+                    }
                 }
-            }
-        }
-    ) { paddingValues ->
-        NavHost(
-            navController = navController,
-            startDestination = ScreenRouteDef.HomeTab.routeName,
-            modifier = Modifier.padding(paddingValues = paddingValues)
-        ) {
-            composable(ScreenRouteDef.HomeTab.routeName) { HomeScreen(navController) }
-            composable("login") { LoginScreen(navController) }
-            sliceNavGraph(navController)
+            )
         }
     }
 }
+
+data class BottomNavigationItem(val tabName: String, val icon: Int, val route: String)
