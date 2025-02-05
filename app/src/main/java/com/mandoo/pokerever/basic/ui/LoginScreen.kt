@@ -177,7 +177,10 @@ fun LoginScreen(navController: NavController) {
                 } else {
                     viewModel.loginUser(email, pass) { success ->
                         if (success) {
-                            navController.navigate("bottom_tab")
+                            navController.navigate("home") {
+                                popUpTo("login") { inclusive = true }
+                                launchSingleTop = true
+                            }
                         } else {
                             errorMessage = "로그인 실패: 잘못된 이메일 또는 비밀번호" // 실패 시 오류 메시지 설정
                         }
