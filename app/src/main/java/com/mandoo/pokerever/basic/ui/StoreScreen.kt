@@ -1,24 +1,15 @@
 package com.mandoo.pokerever.basic.ui
 
+import android.annotation.SuppressLint
+import android.content.Context
+import android.location.Location
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,37 +22,28 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.mandoo.pokerever.R
-import com.mandoo.pokerever.location.LocationProvider
 import com.mandoo.pokerever.viewmodel.StoreViewModel
 import com.mandoo.pokerever.widget.LazyStoreList
 
 @Composable
 fun StoreScreen(navController: NavController) {
     val storeViewModel: StoreViewModel = viewModel()
+    val context = LocalContext.current
+    val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
+    var userLat by remember { mutableStateOf(0.0) }
+    var userLon by remember { mutableStateOf(0.0) }
 
-    // 현재 사용자 ID 가져오기
-    val userId = storeViewModel.getUserId() ?: ""
-    var userLat by remember { mutableStateOf<Double?>(null) }
-    var userLon by remember { mutableStateOf<Double?>(null) }
-
-    // Firestore에서 매장 정보를 로드
+    // 사용자 위치 가져오기
     LaunchedEffect(Unit) {
-        storeViewModel.loadStores()
-    }
-    // 현재 위치 가져오기
-    val locationProvider = LocationProvider(LocalContext.current)
-    locationProvider.getCurrentLocation { location ->
-        if (location != null) {
-            userLat = location.latitude
-            userLon = location.longitude
-        } else {
-            // 위치를 가져오지 못했을 때 처리
-            userLat = null
-            userLon = null
+        getLastKnownLocation(fusedLocationClient) { lat, lon ->
+            userLat = lat
+            userLon = lon
+            storeViewModel.initializeData(userLat, userLon)
         }
     }
-
 
     Column(
         modifier = Modifier
@@ -103,12 +85,12 @@ fun StoreScreen(navController: NavController) {
         )
 
         // 검색어 및 필터링된 매장을 LazyStoreList로 표시
-        if (userLat != null && userLon != null) {
+        if (userLat != 0.0 && userLon != 0.0) {
             LazyStoreList(
                 searchQuery = storename,
                 viewModel = storeViewModel,
-                userLat = userLat!!,
-                userLon = userLon!!
+                userLat = userLat,
+                userLon = userLon
             )
         } else {
             // 위치를 가져오는 동안 대체 UI 표시
@@ -119,5 +101,17 @@ fun StoreScreen(navController: NavController) {
                 modifier = Modifier.padding(top = 16.dp)
             )
         }
+    }
+}
+
+// 사용자 위치 가져오는 함수
+@SuppressLint("MissingPermission")
+fun getLastKnownLocation(fusedLocationClient: FusedLocationProviderClient, onLocationReceived: (Double, Double) -> Unit) {
+    fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
+        if (location != null) {
+            onLocationReceived(location.latitude, location.longitude)
+        }
+    }.addOnFailureListener {
+        onLocationReceived(0.0, 0.0) // 기본값 설정
     }
 }
