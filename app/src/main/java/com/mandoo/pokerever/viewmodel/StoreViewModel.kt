@@ -22,15 +22,25 @@ class StoreViewModel : ViewModel() {
     }
 
     // Firestore에서 모든 매장 로드
-    fun loadStores() {
+    fun loadStores(userLat: Double, userLng: Double) {
         viewModelScope.launch {
             db.collection("stores").get().addOnSuccessListener { result ->
                 val stores = result.documents.map { doc ->
-                    doc.toObject(StoreInfo::class.java)?.copy(sid = doc.id)
-                }.filterNotNull() // null 필터링
+                    doc.toObject(StoreInfo::class.java)?.copy(
+                        sid = doc.id,
+                        distance = calculateDistance(
+                            userLat,
+                            userLng,
+                            doc.getDouble("latitude") ?: 0.0,
+                            doc.getDouble("longitude") ?: 0.0
+                        )
+                    )
+                }.filterNotNull()
+                    .sortedBy { it.distance } // 거리 순 정렬
+
                 storeList.clear()
                 storeList.addAll(stores)
-                Log.d("StoreViewModel", "Firestore 요청 성공: ${stores.size}개의 매장 데이터 로드")
+                Log.d("StoreViewModel", "Firestore 요청 성공: ${stores.size}개의 매장 데이터 로드 (거리순 정렬됨)")
             }.addOnFailureListener { e ->
                 Log.e("StoreViewModel", "Failed to load stores: ${e.localizedMessage}")
             }
@@ -55,16 +65,16 @@ class StoreViewModel : ViewModel() {
 
     // 거리 계산 함수
     fun calculateDistance(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
-        val radius = 6371 // 지구 반지름 (km)
+        val R = 6371 // 지구 반지름 (km)
         val dLat = Math.toRadians(lat2 - lat1)
         val dLon = Math.toRadians(lon2 - lon1)
-
         val a = sin(dLat / 2) * sin(dLat / 2) +
                 cos(Math.toRadians(lat1)) * cos(Math.toRadians(lat2)) *
                 sin(dLon / 2) * sin(dLon / 2)
-
         val c = 2 * atan2(sqrt(a), sqrt(1 - a))
-        return radius * c * 1000 // 거리(m)
+        val distanceKm = R * c // 거리 (km 단위)
+
+        return distanceKm * 1000 // m 단위 변환
     }
 
     // Firestore에서 모든 매장 로드 및 거리 계산
@@ -72,18 +82,23 @@ class StoreViewModel : ViewModel() {
         viewModelScope.launch {
             db.collection("stores").get().addOnSuccessListener { result ->
                 val stores = result.documents.mapNotNull { doc ->
-                    doc.toObject(StoreInfo::class.java)?.copy(sid = doc.id)?.let { store ->
-                        val distance = store.geoPoint?.let {
-                            calculateDistance(userLat, userLon, it.latitude, it.longitude)
-                        } ?: Double.MAX_VALUE
-                        store.copy(distance = distance)
+                    val geoPoint = doc.getGeoPoint("geoPoint") // Firestore에서 GeoPoint 가져오기
+
+                    geoPoint?.let {
+                        doc.toObject(StoreInfo::class.java)?.copy(
+                            sid = doc.id,
+                            distance = calculateDistance(
+                                userLat, userLon, it.latitude, it.longitude // GeoPoint 사용
+                            )
+                        )
                     }
                 }
+                    .sortedBy { it.distance } // 거리순 정렬 적용
+
                 storeList.clear()
-                storeList.addAll(stores.sortedBy { it.distance })
-                Log.d("StoreViewModel", "거리 계산 후 매장 리스트 정렬 완료")
-            }.addOnFailureListener { e ->
-                Log.e("StoreViewModel", "Failed to load stores: ${e.localizedMessage}")
+                storeList.addAll(stores)
+
+                Log.d("StoreViewModel", "매장 ${stores.size}개 로드 (거리순 정렬 완료)")
             }
         }
     }
@@ -107,16 +122,20 @@ class StoreViewModel : ViewModel() {
             .document(userId)
 
         db.runBatch { batch ->
-            batch.set(userStoreRef, mapOf(
-                "storeName" to storeInfo.storeName,
-                "address" to storeInfo.address,
-                "points" to 0,
-                "imageRes" to storeInfo.imageRes
-            ))
-            batch.set(storeUserRef, mapOf(
-                "userName" to "사용자 이름", // 적절한 값으로 변경 필요
-                "points" to 0
-            ))
+            batch.set(
+                userStoreRef, mapOf(
+                    "storeName" to storeInfo.storeName,
+                    "address" to storeInfo.address,
+                    "points" to 0,
+                    "imageRes" to storeInfo.imageRes
+                )
+            )
+            batch.set(
+                storeUserRef, mapOf(
+                    "userName" to "사용자 이름", // 적절한 값으로 변경 필요
+                    "points" to 0
+                )
+            )
         }.addOnSuccessListener { onSuccess() }
             .addOnFailureListener { e ->
                 Log.e("StoreViewModel", "Failed to add store: ${e.localizedMessage}")

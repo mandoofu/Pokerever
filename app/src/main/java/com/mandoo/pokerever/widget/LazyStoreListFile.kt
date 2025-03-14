@@ -52,7 +52,12 @@ import com.mandoo.pokerever.utils.FirebaseStorageCache
 import com.mandoo.pokerever.viewmodel.StoreViewModel
 
 @Composable
-fun LazyStoreList(searchQuery: String, viewModel: StoreViewModel, userLat: Double, userLon: Double) {
+fun LazyStoreList(
+    searchQuery: String,
+    viewModel: StoreViewModel,
+    userLat: Double,
+    userLon: Double
+) {
     val stores = viewModel.storeList
     val userAddedStores = viewModel.userAddedStores
 
@@ -61,6 +66,7 @@ fun LazyStoreList(searchQuery: String, viewModel: StoreViewModel, userLat: Doubl
         userAddedStores.none { it == store.sid } &&
                 store.storeName.contains(searchQuery, ignoreCase = true)
     }
+        .sortedBy { it.distance } // 거리순 정렬 추가
     LazyColumn {
         items(filteredStores) { store ->
             // 거리 계산 수행
@@ -78,7 +84,7 @@ fun LazyStoreList(searchQuery: String, viewModel: StoreViewModel, userLat: Doubl
                     val userId = viewModel.getUserId() ?: return@StoreListItemUI
                     viewModel.addStoreForUser(userId, updatedStoreInfo) {
                         // 추가 후 데이터 동기화
-                        viewModel.loadStores()
+                        viewModel.loadStores(userLat, userLon)
                         viewModel.loadUserAddedStores(userId)
                     }
                 }
