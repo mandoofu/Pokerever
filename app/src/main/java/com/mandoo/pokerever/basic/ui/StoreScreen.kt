@@ -4,8 +4,8 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.location.Location
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
@@ -29,12 +29,12 @@ import com.mandoo.pokerever.viewmodel.StoreViewModel
 import com.mandoo.pokerever.widget.LazyStoreList
 
 @Composable
-fun StoreScreen(navController: NavController) {
-    val storeViewModel: StoreViewModel = viewModel()
+fun StoreScreen(navController: NavController, storeViewModel: StoreViewModel = viewModel()) {
     val context = LocalContext.current
     val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
     var userLat by remember { mutableStateOf(0.0) }
     var userLon by remember { mutableStateOf(0.0) }
+    var storename by remember { mutableStateOf("") }
 
     // 사용자 위치 가져오기
     LaunchedEffect(Unit) {
@@ -53,8 +53,6 @@ fun StoreScreen(navController: NavController) {
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.Start
     ) {
-        var storename by remember { mutableStateOf("") }
-
         // 검색 입력 필드
         OutlinedTextField(
             value = storename,
@@ -84,23 +82,13 @@ fun StoreScreen(navController: NavController) {
                 .padding(vertical = 8.dp)
         )
 
-        // 검색어 및 필터링된 매장을 LazyStoreList로 표시
-        if (userLat != 0.0 && userLon != 0.0) {
-            LazyStoreList(
-                searchQuery = storename,
-                viewModel = storeViewModel,
-                userLat = userLat,
-                userLon = userLon
-            )
-        } else {
-            // 위치를 가져오는 동안 대체 UI 표시
-            Text(
-                text = stringResource(R.string.loading_location),
-                color = Color.White,
-                style = TextStyle(fontSize = 16.sp),
-                modifier = Modifier.padding(top = 16.dp)
-            )
-        }
+        // 매장 목록 표시
+        LazyStoreList(
+            searchQuery = storename,
+            viewModel = storeViewModel,
+            userLat = userLat,
+            userLon = userLon
+        )
     }
 }
 
