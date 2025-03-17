@@ -1,20 +1,25 @@
 package com.mandoo.pokerever.viewmodel
 
 import android.util.Log
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.mandoo.pokerever.common.StoreInfo
+import com.mandoo.pokerever.utils.fetchUserAddedStores
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import kotlin.math.*
 
 class StoreViewModel : ViewModel() {
     private val db = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
 
-    var storeList = mutableStateListOf<StoreInfo>() // 모든 매장
+    var storeList by mutableStateOf<List<StoreInfo>>(emptyList())
     var userAddedStores = mutableStateListOf<String>() // 유저가 추가한 매장 ID
 
     fun getUserId(): String? {
@@ -37,9 +42,7 @@ class StoreViewModel : ViewModel() {
                     )
                 }.filterNotNull()
                     .sortedBy { it.distance } // 거리 순 정렬
-
-                storeList.clear()
-                storeList.addAll(stores)
+                storeList = stores
                 Log.d("StoreViewModel", "Firestore 요청 성공: ${stores.size}개의 매장 데이터 로드 (거리순 정렬됨)")
             }.addOnFailureListener { e ->
                 Log.e("StoreViewModel", "Failed to load stores: ${e.localizedMessage}")
@@ -94,10 +97,7 @@ class StoreViewModel : ViewModel() {
                     }
                 }
                     .sortedBy { it.distance } // 거리순 정렬 적용
-
-                storeList.clear()
-                storeList.addAll(stores)
-
+                storeList = stores
                 Log.d("StoreViewModel", "매장 ${stores.size}개 로드 (거리순 정렬 완료)")
             }
         }
@@ -107,10 +107,53 @@ class StoreViewModel : ViewModel() {
     fun initializeData(userLat: Double, userLon: Double) {
         val userId = getUserId()
         if (userId != null) {
-            loadStoresWithDistance(userLat, userLon)
-            loadUserAddedStores(userId)
+            viewModelScope.launch {
+                val stores = fetchStores(userLat, userLon) // Firestore에서 매장 데이터 가져오기
+                val addedStores = fetchUserAddedStores(userId) // 유저가 추가한 매장 데이터 가져오기
+
+                storeList = stores
+                userAddedStores.clear()
+                userAddedStores.addAll(addedStores)
+            }
         } else {
             Log.w("StoreViewModel", "사용자 ID를 가져올 수 없습니다.")
+        }
+    }
+
+    private suspend fun fetchStores(userLat: Double, userLon: Double): List<StoreInfo> {
+        return try {
+            val result = db.collection("stores").get().await()
+            val stores = result.documents.mapNotNull { doc ->
+                val geoPoint = doc.getGeoPoint("geoPoint")
+                geoPoint?.let {
+                    StoreInfo(
+                        sid = doc.id,
+                        storeName = doc.getString("storeName") ?: "이름 없음",
+                        address = doc.getString("address") ?: "주소 없음",
+                        imageRes = doc.getString("imageRes") ?: "",
+                        distance = calculateDistance(userLat, userLon, it.latitude, it.longitude),
+                        geoPoint = geoPoint
+                    )
+                }
+            }.sortedBy { it.distance }
+
+            Log.d("StoreViewModel", "Firestore에서 ${stores.size}개 매장 로드 완료 (거리순 정렬 적용됨)")
+            stores
+        } catch (e: Exception) {
+            Log.e("StoreViewModel", "Firestore 데이터 로드 실패: ${e.localizedMessage}")
+            emptyList()
+        }
+    }
+
+    private suspend fun fetchUserAddedStores(userId: String): List<String> {
+        return try {
+            val result = db.collection("users").document(userId).collection("addedStores").get().await()
+            val addedStoreIds = result.documents.map { it.id }
+            Log.d("StoreViewModel", "유저가 추가한 매장 로드 성공: ${addedStoreIds.size}개")
+            addedStoreIds
+        } catch (e: Exception) {
+            Log.e("StoreViewModel", "Failed to fetch added stores: ${e.localizedMessage}")
+            emptyList()
         }
     }
 

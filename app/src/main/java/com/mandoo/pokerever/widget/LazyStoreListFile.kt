@@ -50,6 +50,7 @@ import com.mandoo.pokerever.common.StoreInfo
 import com.mandoo.pokerever.map.openNaverMap
 import com.mandoo.pokerever.utils.FirebaseStorageCache
 import com.mandoo.pokerever.viewmodel.StoreViewModel
+import java.util.Locale
 
 @Composable
 fun LazyStoreList(
@@ -116,6 +117,13 @@ fun StoreListItemUI(storeInfo: StoreInfo, onItemClick: (StoreInfo) -> Unit) {
                 isLoading = false
             }
         )
+    }
+    fun formatDistance(distanceInMeters: Double): String {
+        return if (distanceInMeters >= 1000) {
+            String.format(Locale.US, "%.1f km", distanceInMeters / 1000)
+        } else {
+            "${distanceInMeters.toInt()} m"
+        }
     }
 
     Card(
@@ -232,7 +240,7 @@ fun StoreListItemUI(storeInfo: StoreInfo, onItemClick: (StoreInfo) -> Unit) {
                     )
                     Spacer(modifier = Modifier.width(1.dp))
                     Text(
-                        text = "${storeInfo.distance.toInt()} M", // 미터 단위로 표시
+                        text = formatDistance(storeInfo.distance), // 미터 단위로 표시
                         style = typography.bodySmall,
                         color = Color.White
                     )
