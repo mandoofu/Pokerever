@@ -40,11 +40,13 @@ fun StoreDetailScreen(
     val storeName by viewModel.storeName
     val userPoints by viewModel.userPoints
     val transactions by viewModel.transactionHistory
+    TransactionList(transactions = transactions)
 
     // Firestore 데이터 로드
     LaunchedEffect(storeId, userId) {
-        viewModel.loadStoreAndUserPoints(storeId, userId)
-        viewModel.loadTransactionHistory(userId, storeId)
+        if (storeId.isNotEmpty() && userId.isNotEmpty()) {
+            viewModel.startObserving(storeId, userId)
+        }
     }
 
     val isInputValid = pointInput.toIntOrNull()?.let { it in 1..userPoints } ?: false
@@ -137,7 +139,10 @@ fun StoreDetailScreen(
             horizontalArrangement = Arrangement.spacedBy(68.dp)
         ) {
             Text(text = stringResource(R.string.from_user), style = receivingPointInfoTextStyle)
-            Text(text = stringResource(R.string.recipient_user), style = receivingPointInfoTextStyle)
+            Text(
+                text = stringResource(R.string.recipient_user),
+                style = receivingPointInfoTextStyle
+            )
             Text(text = stringResource(R.string.time), style = receivingPointInfoTextStyle)
             Text(text = stringResource(R.string.quantity), style = receivingPointInfoTextStyle)
         }
@@ -242,7 +247,10 @@ fun StoreDetailScreen(
                                         points = pointInput.toInt(), // 전송할 포인트
                                         onSuccess = {
                                             // 성공적으로 포인트를 전송한 후 처리
-                                            viewModel.loadStoreAndUserPoints(storeId, userId) // 업데이트된 데이터 다시 로드
+                                            viewModel.loadStoreAndUserPoints(
+                                                storeId,
+                                                userId
+                                            ) // 업데이트된 데이터 다시 로드
                                         },
                                         onFailure = { errorMessage ->
                                             // 실패 메시지 표시 (예: Toast)

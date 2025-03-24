@@ -1,5 +1,6 @@
 package com.mandoo.pokerever.utils
 
+import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
 import java.util.*
 
@@ -14,37 +15,52 @@ fun sendPoints(
 ) {
     val db = FirebaseFirestore.getInstance()
 
-    val userRef = db.collection("users").document(fromId).collection("addedStores").document(toId) // 사용자 -> 매장
-    val storeRef = db.collection("stores").document(toId) // 매장 메인 문서
-    val storeUserRef = db.collection("stores").document(toId).collection("users").document(fromId) // 매장 -> 사용자
-    val transactionsRef = db.collection("transactions").document() // 트랜잭션 기록
+    val userRef = db.collection("users").document(fromId)
+        .collection("addedStores").document(toId)
+
+    val storeRef = db.collection("stores").document(toId)
+
+    val storeUserRef = db.collection("stores").document(toId)
+        .collection("users").document(fromId)
 
     db.runTransaction { transaction ->
-        // 사용자 -> 매장 (addedStores)에서 포인트 가져오기
         val userSnapshot = transaction.get(userRef)
-        val currentUserPoints = userSnapshot.getLong("points")?.toInt() ?: 0
-        if (currentUserPoints < points) {
-            throw Exception("사용자의 포인트가 부족합니다.")
-        }
-
-        // 매장 메인 문서에서 포인트 가져오기
         val storeSnapshot = transaction.get(storeRef)
-        val currentStorePoints = storeSnapshot.getLong("points")?.toInt() ?: 0
-
-        // 매장 -> 사용자 서브컬렉션에서 포인트 가져오기
         val storeUserSnapshot = transaction.get(storeUserRef)
+
+        val currentUserPoints = userSnapshot.getLong("points")?.toInt() ?: 0
+        val currentStorePoints = storeSnapshot.getLong("points")?.toInt() ?: 0
         val currentStoreUserPoints = storeUserSnapshot.getLong("points")?.toInt() ?: 0
 
-        // 업데이트: 사용자 -> 매장 포인트 차감
-        transaction.update(userRef, "points", currentUserPoints - points)
+        if (currentUserPoints < points) {
+            throw Exception("사용자 포인트 부족")
+        }
 
-        // 업데이트: 매장 메인 문서 포인트 증가
-        transaction.update(storeRef, "points", currentStorePoints + points)
+        val newUserPoints = currentUserPoints - points
+        val newStorePoints = currentStorePoints + points
+        val newStoreUserPoints = currentStoreUserPoints - points
 
-        // 업데이트: 매장 -> 사용자 포인트 차감
-        transaction.update(storeUserRef, "points", currentStoreUserPoints - points)
+        if (newUserPoints != currentUserPoints) {
+            transaction.update(userRef, "points", newUserPoints)
+            Log.d("sendPoints", "userRef updated: $currentUserPoints → $newUserPoints")
+        } else {
+            Log.d("sendPoints", "⚠userRef points unchanged: $currentUserPoints")
+        }
 
-        // 트랜잭션 기록 추가
+        if (newStorePoints != currentStorePoints) {
+            transaction.update(storeRef, "points", newStorePoints)
+            Log.d("sendPoints", "storeRef updated: $currentStorePoints → $newStorePoints")
+        }
+
+        if (newStoreUserPoints != currentStoreUserPoints) {
+            transaction.update(storeUserRef, "points", newStoreUserPoints)
+            Log.d("sendPoints", "storeUserRef updated: $currentStoreUserPoints → $newStoreUserPoints")
+        }
+
+
+        null // 트랜잭션 커밋 명시
+    }.addOnSuccessListener {
+        // 트랜잭션 성공 후 거래 기록 저장
         val transactionData = hashMapOf(
             "from" to fromId,
             "fromType" to fromType,
@@ -53,10 +69,20 @@ fun sendPoints(
             "points" to points,
             "timestamp" to Date().time
         )
-        transaction.set(transactionsRef, transactionData)
-    }.addOnSuccessListener {
-        onSuccess()
+
+        db.collection("transactions").document()
+            .set(transactionData)
+            .addOnSuccessListener {
+                Log.d("sendPoints", "거래 기록 저장 성공")
+                onSuccess()
+            }
+            .addOnFailureListener { e ->
+                Log.e("sendPoints", "거래 기록 저장 실패: ${e.message}", e)
+                onFailure("포인트는 전송됐지만 기록 저장 실패")
+            }
+
     }.addOnFailureListener { e ->
-        onFailure(e.localizedMessage ?: "Failed to send points")
+        Log.e("sendPoints", "포인트 전송 실패: ${e.message}", e)
+        onFailure(e.message ?: "전송 실패")
     }
 }
