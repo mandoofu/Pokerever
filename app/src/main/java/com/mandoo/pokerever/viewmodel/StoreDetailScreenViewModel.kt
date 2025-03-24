@@ -54,7 +54,7 @@ class StoreDetailScreenViewModel : ViewModel() {
     fun observeTransactionHistory(storeId: String) {
         db.collection("transactions")
             .whereEqualTo("to", storeId)
-            .whereEqualTo("toType", "store") // storeType도 반드시 필터링
+            .whereEqualTo("toType", "store")
             .orderBy("timestamp", Query.Direction.DESCENDING)
             .addSnapshotListener { snapshots, e ->
                 if (e != null) {
@@ -62,11 +62,51 @@ class StoreDetailScreenViewModel : ViewModel() {
                     return@addSnapshotListener
                 }
 
-                val transactionList = snapshots?.documents
-                    ?.mapNotNull { it.toObject(Transaction::class.java) }
-                    ?: emptyList()
+                val documents = snapshots?.documents ?: return@addSnapshotListener
+                val transactions = documents.mapNotNull { doc ->
+                    val transaction = doc.toObject(Transaction::class.java)
+                    transaction?.copy(id = doc.id) // doc.id 설정
+                }
 
-                transactionHistory.value = transactionList
+                // 모든 이름을 비동기로 가져와서 하나의 업데이트로 처리
+                val updatedTransactions = mutableListOf<Transaction>()
+                var updatedCount = 0
+                val total = transactions.size * 2 // from + to
+
+                if (transactions.isEmpty()) {
+                    transactionHistory.value = emptyList()
+                    return@addSnapshotListener
+                }
+
+                transactions.forEach { transaction ->
+                    fetchName(transaction.from, transaction.fromType) { name ->
+                        transaction.fromName = name
+                        updatedCount++
+                        if (updatedCount == total) {
+                            transactionHistory.value = transactions.toList()
+                        }
+                    }
+                    fetchName(transaction.to, transaction.toType) { name ->
+                        transaction.toName = name
+                        updatedCount++
+                        if (updatedCount == total) {
+                            transactionHistory.value = transactions.toList()
+                        }
+                    }
+                }
             }
     }
+
+    private fun fetchName(id: String, type: String, callback: (String) -> Unit) {
+        val collection = if (type == "user") "users" else "stores"
+        db.collection(collection).document(id).get()
+            .addOnSuccessListener {
+                val name = if (type == "user") it.getString("name") else it.getString("storeName")
+                callback(name ?: "Unknown")
+            }
+            .addOnFailureListener {
+                callback("Unknown")
+            }
+    }
+
 }

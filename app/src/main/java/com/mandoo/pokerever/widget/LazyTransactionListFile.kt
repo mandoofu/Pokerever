@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -25,9 +26,9 @@ fun TransactionList(transactions: List<Transaction>) {
             .fillMaxSize()
             .padding(top = 8.dp)
     ) {
-        items(transactions) { transaction ->
-            TransactionItem(transaction)
-            Divider(color = Color.Gray, thickness = 1.dp)
+        items(transactions, key = { it.id ?: (it.from + it.to + it.timestamp.toString()) }) {
+            TransactionItem(it)
+            HorizontalDivider(color = Color.Gray, thickness = 1.dp)
         }
     }
 }
@@ -77,8 +78,8 @@ fun TransactionItem(transaction: Transaction) {
             .padding(vertical = 8.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(text = fromName.value, fontSize = 14.sp, color = Color.White)
-        Text(text = toName.value, fontSize = 14.sp, color = Color.White)
+        Text(text = transaction.fromName ?: transaction.from, fontSize = 14.sp, color = Color.White)
+        Text(text = transaction.toName ?: transaction.to, fontSize = 14.sp, color = Color.White)
         Text(text = dateTime, fontSize = 12.sp, color = Color.White)
         Text(text = "${transaction.points}P", fontSize = 14.sp, color = Color.White)
     }
