@@ -17,31 +17,31 @@ Jetpack Compose 기반의 최신 Android 기술을 활용하여 실시간 UI 업
 
 ### 🔐 회원가입
 
-<video src="https://github.com/mandoofu/Pokerever/raw/main/assets/회원가입.mp4" width="100%" autoplay loop muted playsinline></video>
+[![회원가입](assets/main.png)](https://github.com/mandoofu/Pokerever/raw/main/assets/회원가입.mp4)
 
 ---
 
 ### 🏪 매장정보 확인
 
-<video src="https://github.com/mandoofu/Pokerever/raw/main/assets/매장정보.mp4" width="100%" autoplay loop muted playsinline></video>
+[![매장정보](assets/main.png)](https://github.com/mandoofu/Pokerever/raw/main/assets/매장정보.mp4)
 
 ---
 
 ### 📊 탭별 정보 인터페이스
 
-<video src="https://github.com/mandoofu/Pokerever/raw/main/assets/탭별정보.mp4" width="100%" autoplay loop muted playsinline></video>
+[![탭별정보](assets/main.png)](https://github.com/mandoofu/Pokerever/raw/main/assets/탭별정보.mp4)
 
 ---
 
 ### 💸 포인트 송수신 기능
 
-<video src="https://github.com/mandoofu/Pokerever/raw/main/assets/포인트송수신.mp4" width="100%" autoplay loop muted playsinline></video>
+[![포인트송수신](assets/main.png)](https://github.com/mandoofu/Pokerever/raw/main/assets/포인트송수신.mp4)
 
 ---
 
 ### 📍 매장위치 확인
 
-<video src="https://github.com/mandoofu/Pokerever/raw/main/assets/매장위치.mp4" width="100%" autoplay loop muted playsinline></video>
+[![매장위치](assets/main.png)](https://github.com/mandoofu/Pokerever/raw/main/assets/매장위치.mp4)
 
 ---
 
