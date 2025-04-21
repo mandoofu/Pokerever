@@ -12,32 +12,30 @@ Jetpack Compose 기반의 최신 Android 기술을 활용하여 실시간 UI 업
 사용자 인터랙션을 효율적으로 구현했습니다.
 
 ---
+<h2>📽️ 데모 영상 (GIF)</h2>
 
-<h2>📽️ 데모 영상 (Pokerever 주요 기능 시연)</h2>
+<table>
+  <tr>
+    <td align="center"><strong>🔐 회원가입</strong></td>
+    <td align="center"><strong>🏪 매장정보 확인</strong></td>
+  </tr>
+  <tr>
+    <td><img src="assets/회원가입.gif" width="100%"/></td>
+    <td><img src="assets/매장정보.gif" width="100%"/></td>
+  </tr>
 
-<p>
-  <a href="https://github.com/mandoofu/Pokerever/raw/main/assets/회원가입.mp4">
-    <img src="assets/main.png" alt="회원가입" width="48%" />
-  </a>
-  <a href="https://github.com/mandoofu/Pokerever/raw/main/assets/매장정보.mp4">
-    <img src="assets/main.png" alt="매장정보" width="48%" />
-  </a>
-</p>
+  <tr>
+    <td align="center"><strong>📊 탭별 정보 인터페이스</strong></td>
+    <td align="center"><strong>💸 포인트 송수신 기능</strong></td>
+  </tr>
+  <tr>
+    <td><img src="assets/탭별정보.gif" width="100%"/></td>
+    <td><img src="assets/포인트송수신.gif" width="100%"/></td>
+  </tr>
+</table>
 
-<p>
-  <a href="https://github.com/mandoofu/Pokerever/raw/main/assets/탭별정보.mp4">
-    <img src="assets/main.png" alt="탭별정보" width="48%" />
-  </a>
-  <a href="https://github.com/mandoofu/Pokerever/raw/main/assets/포인트송수신.mp4">
-    <img src="assets/main.png" alt="포인트송수신" width="48%" />
-  </a>
-</p>
-
-<p>
-  <a href="https://github.com/mandoofu/Pokerever/raw/main/assets/매장위치.mp4">
-    <img src="assets/main.png" alt="매장위치" width="48%" />
-  </a>
-</p>
+### 📍 매장위치 확인  
+<img src="assets/매장위치.gif" width="48%" />
 
 ---
 
