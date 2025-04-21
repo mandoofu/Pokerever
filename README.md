@@ -22,23 +22,25 @@ Jetpack Compose 기반의 최신 Android 기술을 활용하여 실시간 UI 업
     <td align="center"><strong>📍 매장위치</strong></td>
   </tr>
   <tr>
-    <td><img src="assets/회원가입.gif" width="280px"/></td>
-    <td><img src="assets/매장정보.gif" width="280px"/></td>
-    <td><img src="assets/매장위치.gif" width="280px"/></td>
-  </tr>
-
-  <tr>
-    <td align="center" colspan="3">
-      <strong>📊 탭별정보 &nbsp;&nbsp;&nbsp;&nbsp; 💸 포인트 송수신</strong>
-    </td>
-  </tr>
-  <tr>
-    <td colspan="3" align="center">
-      <img src="assets/탭별정보.gif" width="280px" style="margin-right: 20px;"/>
-      <img src="assets/포인트송수신.gif" width="280px"/>
-    </td>
+    <td><img src="assets/회원가입.gif" width="240px"/></td>
+    <td><img src="assets/매장정보.gif" width="240px"/></td>
+    <td><img src="assets/매장위치.gif" width="240px"/></td>
   </tr>
 </table>
+
+<br/>
+
+<table>
+  <tr>
+    <td align="center"><strong>📊 탭별정보</strong></td>
+    <td align="center"><strong>💸 포인트 송수신</strong></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="assets/탭별정보.gif" width="280px"/></td>
+    <td align="center"><img src="assets/포인트송수신.gif" width="280px"/></td>
+  </tr>
+</table>
+
 
 ---
 
