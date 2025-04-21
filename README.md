@@ -6,6 +6,9 @@
 Firestore 기반 포인트 관리 및 트랜잭션 내역 표시 기능을 포함한 포인트 추적 앱입니다.  
 Jetpack Compose 기반의 최신 Android 기술을 활용하여 실시간 UI 업데이트, 트랜잭션 로그 표시,  
 사용자 인터랙션을 효율적으로 구현했습니다.
+<p align="center">
+  <img src="https://github.com/mandoofu/Pokerever/blob/main/assets/mainimg.png?raw=true" alt="Pokerever UI Preview" width="400"/>
+</p>
 
 ---
 
